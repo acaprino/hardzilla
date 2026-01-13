@@ -106,7 +106,7 @@ class GranularPrivacyGUI:
 
             # Cookie management
             'cookie_lifetime': tk.StringVar(value='normal'),  # normal, session, days
-            'cookie_days': tk.IntVar(value=30),
+            # Note: cookie_days is managed by SETTINGS_METADATA as a 'choice' type with labels
             'third_party_cookies': tk.StringVar(value='cross-site'),  # all, cross-site, none, visited
 
             # Tracking protection
@@ -1033,7 +1033,9 @@ class GranularPrivacyGUI:
         self.days_frame.pack(anchor="w", padx=30, pady=8)
 
         ctk.CTkLabel(self.days_frame, text="Delete after:").pack(side="left")
-        self.cookie_days_str = tk.StringVar(value=str(self.privacy_vars['cookie_days'].get()))
+        # Get initial value from settings_vars if available, otherwise use default
+        initial_days = self._get_cookie_days_value()
+        self.cookie_days_str = tk.StringVar(value=str(initial_days))
         self.cookie_days_str.trace_add('write', self._sync_cookie_days)
         self.days_entry = ctk.CTkEntry(self.days_frame, width=60, textvariable=self.cookie_days_str)
         self.days_entry.pack(side="left", padx=5)
@@ -1963,12 +1965,76 @@ class GranularPrivacyGUI:
             state = "normal" if self.privacy_vars['cookie_lifetime'].get() == 'days' else "disabled"
             self.days_entry.configure(state=state)
 
+    def _get_cookie_days_value(self) -> int:
+        """Get the current cookie_days value as an integer.
+
+        Handles both raw integer values and label strings from SETTINGS_METADATA.
+        """
+        if 'cookie_days' not in self.settings_vars:
+            return 30  # Default value
+
+        val = self.settings_vars['cookie_days'].get()
+
+        # If it's already an integer, return it
+        if isinstance(val, int):
+            return val
+
+        # Try to parse as integer
+        try:
+            return int(val)
+        except (ValueError, TypeError):
+            pass
+
+        # Check if it's a label from SETTINGS_METADATA
+        meta = SETTINGS_METADATA.get('cookie_days', {})
+        labels = meta.get('labels', [])
+        values = meta.get('values', [])
+
+        if val in labels:
+            idx = labels.index(val)
+            if idx < len(values):
+                return values[idx]
+
+        return 30  # Default fallback
+
+    def _set_cookie_days_value(self, days: int) -> None:
+        """Set the cookie_days value, converting to label if needed.
+
+        Args:
+            days: The number of days as an integer
+        """
+        if 'cookie_days' not in self.settings_vars:
+            # Ensure the variable exists
+            meta = SETTINGS_METADATA.get('cookie_days', {})
+            if meta:
+                self._ensure_setting_var('cookie_days', meta)
+            else:
+                return
+
+        meta = SETTINGS_METADATA.get('cookie_days', {})
+        values = meta.get('values', [])
+        labels = meta.get('labels', [])
+
+        # Find the closest matching value
+        if days in values:
+            idx = values.index(days)
+            self.settings_vars['cookie_days'].set(labels[idx])
+        else:
+            # Find closest value
+            closest = min(values, key=lambda x: abs(x - days)) if values else days
+            idx = values.index(closest)
+            self.settings_vars['cookie_days'].set(labels[idx])
+
+        # Also update the entry field if it exists
+        if hasattr(self, 'cookie_days_str'):
+            self.cookie_days_str.set(str(days))
+
     def _sync_cookie_days(self, *args):
-        """Sync the StringVar entry to the IntVar for cookie_days"""
+        """Sync the StringVar entry to settings_vars for cookie_days"""
         try:
             value = int(self.cookie_days_str.get())
             if value > 0:
-                self.privacy_vars['cookie_days'].set(value)
+                self._set_cookie_days_value(value)
         except ValueError:
             # Invalid input, ignore
             pass
@@ -2095,10 +2161,7 @@ class GranularPrivacyGUI:
             elif cookie_lifetime == 3:
                 self.privacy_vars['cookie_lifetime'].set('days')
                 cookie_days = prefs.get('network.cookie.lifetime.days', 30)
-                self.privacy_vars['cookie_days'].set(cookie_days)
-                # Sync the StringVar for the entry widget
-                if hasattr(self, 'cookie_days_str'):
-                    self.cookie_days_str.set(str(cookie_days))
+                self._set_cookie_days_value(cookie_days)
             else:
                 self.privacy_vars['cookie_lifetime'].set('normal')
 
@@ -2486,7 +2549,7 @@ class GranularPrivacyGUI:
             prefs['"network.cookie.lifetimePolicy"'] = "2"
         elif self.privacy_vars['cookie_lifetime'].get() == 'days':
             prefs['"network.cookie.lifetimePolicy"'] = "3"
-            prefs['"network.cookie.lifetime.days"'] = str(self.privacy_vars['cookie_days'].get())
+            prefs['"network.cookie.lifetime.days"'] = str(self._get_cookie_days_value())
         else:
             prefs['"network.cookie.lifetimePolicy"'] = "0"
 
@@ -2976,7 +3039,7 @@ class GranularPrivacyGUI:
                 'settings': {}
             }
 
-            # Save all settings
+            # Save all settings from privacy_vars
             for key, var in self.privacy_vars.items():
                 if isinstance(var, tk.BooleanVar):
                     profile['settings'][key] = var.get()
@@ -2984,6 +3047,24 @@ class GranularPrivacyGUI:
                     profile['settings'][key] = var.get()
                 elif isinstance(var, tk.IntVar):
                     profile['settings'][key] = var.get()
+
+            # Also save settings_vars (for SETTINGS_METADATA-driven settings)
+            for key, var in self.settings_vars.items():
+                if key not in profile['settings']:  # Don't overwrite privacy_vars
+                    if isinstance(var, tk.BooleanVar):
+                        profile['settings'][key] = var.get()
+                    elif isinstance(var, tk.StringVar):
+                        # For choice types with labels, convert back to raw value
+                        val = var.get()
+                        if key in SETTINGS_METADATA:
+                            meta = SETTINGS_METADATA[key]
+                            if meta.get('type') == 'choice' and val in meta.get('labels', []):
+                                idx = meta['labels'].index(val)
+                                if idx < len(meta.get('values', [])):
+                                    val = meta['values'][idx]
+                        profile['settings'][key] = val
+                    elif isinstance(var, tk.IntVar):
+                        profile['settings'][key] = var.get()
 
             with open(filename, 'w') as f:
                 json.dump(profile, f, indent=2)
@@ -3015,6 +3096,21 @@ class GranularPrivacyGUI:
                 for key, value in settings.items():
                     if key in self.privacy_vars:
                         self.privacy_vars[key].set(value)
+                    elif key in self.settings_vars:
+                        # For choice types, convert raw value to label if needed
+                        if key in SETTINGS_METADATA:
+                            meta = SETTINGS_METADATA[key]
+                            if meta.get('type') == 'choice':
+                                values = meta.get('values', [])
+                                labels = meta.get('labels', [])
+                                if value in values:
+                                    idx = values.index(value)
+                                    if idx < len(labels):
+                                        value = labels[idx]
+                        self.settings_vars[key].set(value)
+                    elif key == 'cookie_days':
+                        # Special handling for cookie_days which may not be in settings_vars yet
+                        self._set_cookie_days_value(value if isinstance(value, int) else 30)
 
                 # Update profile state
                 self.profile_state['loaded'] = True
