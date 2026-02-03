@@ -32,8 +32,7 @@ from hardzilla.presentation.views import (
 )
 from hardzilla.presentation.controllers import (
     SetupController,
-    ApplyController,
-    ScreenNavigator
+    ApplyController
 )
 from hardzilla.presentation.utils import KeyboardHandler
 
@@ -42,10 +41,10 @@ class HardzillaGUI(ctk.CTk):
     """
     Main GUI application for Hardzilla v4.0.
 
-    Implements a 3-screen wizard:
-    1. Setup & Intent
-    2. Customize Settings
-    3. Apply to Firefox
+    Implements a 3-tab interface:
+    1. Setup & Presets - Choose profile and Firefox path
+    2. Customize Settings - Review and modify settings
+    3. Apply to Firefox - Apply configuration to Firefox
     """
 
     def __init__(self):
@@ -138,18 +137,20 @@ class HardzillaGUI(ctk.CTk):
         header = self._build_header(main_frame)
         header.pack(fill="x", padx=20, pady=20)
 
-        # Content area (for screens)
-        content_frame = ctk.CTkFrame(main_frame)
-        content_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        # Tabview (replaces wizard navigation)
+        self.tabview = ctk.CTkTabview(main_frame, height=700)
+        self.tabview.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
-        # Initialize navigator
-        self.navigator = ScreenNavigator(content_frame)
+        # Create tabs
+        self.tabview.add("Setup & Presets")
+        self.tabview.add("Customize Settings")
+        self.tabview.add("Apply to Firefox")
 
-        # Create screens
-        self._create_screens(content_frame)
+        # Create content in each tab
+        self._create_tab_content()
 
-        # Show first screen
-        self.navigator.show_screen("setup")
+        # Set default tab
+        self.tabview.set("Setup & Presets")
 
     def _build_header(self, parent):
         """Build application header with enhanced styling"""
@@ -187,62 +188,45 @@ class HardzillaGUI(ctk.CTk):
         )
         subtitle.grid(row=1, column=1, sticky="w", pady=(0, 15))
 
-        # Progress indicator with badge style
-        progress_frame = ctk.CTkFrame(
-            header_frame,
-            fg_color="#3B82F6",
-            corner_radius=20,
-            height=40
-        )
-        progress_frame.grid(row=0, column=2, rowspan=2, padx=20, pady=10)
-
-        self.progress_label = ctk.CTkLabel(
-            progress_frame,
-            text="Step 1 of 3",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#FFFFFF"
-        )
-        self.progress_label.pack(padx=20, pady=10)
-
         return header_frame
 
-    def _create_screens(self, parent):
-        """Create all three screens"""
-        # Screen 1: Setup
-        setup_view = SetupView(
-            parent=parent,
+    def _create_tab_content(self):
+        """Create content for each tab"""
+        # Tab 1: Setup & Presets
+        self.setup_view = SetupView(
+            parent=self.tabview.tab("Setup & Presets"),
             view_model=self.setup_vm,
             on_generate_recommendation=self._on_generate_recommendation,
             on_next=self._on_setup_next
         )
-        self.navigator.register_screen("setup", setup_view)
+        self.setup_view.pack(fill="both", expand=True)
 
-        # Screen 2: Customize
-        customize_view = CustomizeView(
-            parent=parent,
+        # Tab 2: Customize Settings
+        self.customize_view = CustomizeView(
+            parent=self.tabview.tab("Customize Settings"),
             view_model=self.customize_vm,
             on_next=self._on_customize_next,
             on_back=self._on_customize_back
         )
-        self.navigator.register_screen("customize", customize_view)
+        self.customize_view.pack(fill="both", expand=True)
 
-        # Screen 3: Apply
-        apply_view = ApplyView(
-            parent=parent,
+        # Tab 3: Apply to Firefox
+        self.apply_view = ApplyView(
+            parent=self.tabview.tab("Apply to Firefox"),
             view_model=self.apply_vm,
             on_apply=self._on_apply,
             on_install_extensions=self._on_install_extensions,
             on_back=self._on_apply_back
         )
-        self.navigator.register_screen("apply", apply_view)
+        self.apply_view.pack(fill="both", expand=True)
 
     def _init_keyboard_shortcuts(self):
         """Initialize keyboard shortcuts"""
         self.keyboard_handler = KeyboardHandler(self)
 
-        # Register Ctrl+S for apply (when on apply screen)
+        # Register Ctrl+S for apply (when on apply tab)
         def handle_ctrl_s():
-            if self.navigator.current_screen == "apply":
+            if self.tabview.get() == "Apply to Firefox":
                 self._on_apply()
 
         self.keyboard_handler.register_shortcut('<Control-s>', handle_ctrl_s)
@@ -270,7 +254,7 @@ class HardzillaGUI(ctk.CTk):
             self._show_error("Failed to generate recommendation", str(e))
 
     def _on_setup_next(self):
-        """Handle next from setup screen"""
+        """Handle next from setup tab"""
         # Validate Firefox path before proceeding
         if not self.setup_vm.firefox_path:
             self._show_error(
@@ -300,11 +284,10 @@ class HardzillaGUI(ctk.CTk):
                 self._show_error("Failed to load preset", str(e))
                 return
 
-        # Proceed to next screen
+        # Proceed to next tab
         if profile:
             self.customize_vm.profile = profile
-            self.navigator.show_screen("customize")
-            self._update_progress()
+            self.tabview.set("Customize Settings")
         else:
             self._show_error(
                 "No Configuration Selected",
@@ -312,18 +295,16 @@ class HardzillaGUI(ctk.CTk):
             )
 
     def _on_customize_next(self):
-        """Handle next from customize screen"""
+        """Handle next from customize tab"""
         # Pass profile and firefox path to apply view
         if self.customize_vm.profile:
             self.apply_vm.profile = self.customize_vm.profile
             self.apply_vm.firefox_path = self.setup_vm.firefox_path
-            self.navigator.show_screen("apply")
-            self._update_progress()
+            self.tabview.set("Apply to Firefox")
 
     def _on_customize_back(self):
-        """Handle back from customize screen"""
-        self.navigator.show_screen("setup")
-        self._update_progress()
+        """Handle back from customize tab"""
+        self.tabview.set("Setup & Presets")
 
     def _on_apply(self):
         """Handle apply button"""
@@ -342,14 +323,8 @@ class HardzillaGUI(ctk.CTk):
             self._show_error("Failed to install extensions", str(e))
 
     def _on_apply_back(self):
-        """Handle back from apply screen"""
-        self.navigator.show_screen("customize")
-        self._update_progress()
-
-    def _update_progress(self):
-        """Update progress indicator"""
-        current, total = self.navigator.get_progress()
-        self.progress_label.configure(text=f"Step {current}/{total}")
+        """Handle back from apply tab"""
+        self.tabview.set("Customize Settings")
 
     def _show_error(self, title: str, message: str):
         """Show error dialog"""

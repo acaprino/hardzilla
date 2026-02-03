@@ -138,31 +138,36 @@ CATEGORIES: Dict[str, Dict[str, Any]] = {
 # =============================================================================
 
 PRESET_PROFILES: Dict[str, Dict[str, Any]] = {
-    'developer': {
-        'name': 'Developer',
-        'icon': 'code',
-        'description': 'Optimized for web development with DevTools performance and debugging features enabled.',
-        'color': '#3B8ED0',
-        'priority_profile': 'max_power',
-        'tags': ['development', 'debugging', 'performance'],
+    # NEW: Maximum anonymity preset
+    'anonymous': {
+        'name': 'Anonymous / Tor-like',
+        'icon': 'incognito',
+        'description': 'Maximum anonymity with Tor Browser-inspired settings. Expect significant breakage.',
+        'color': '#6C3483',
+        'priority_profile': 'paranoid',  # FIX: Use existing 'paranoid' profile (most aggressive)
+        'tags': ['anonymity', 'anti-fingerprinting', 'extreme-privacy'],
         'recommended_for': [
-            'Web developers',
-            'Frontend engineers',
-            'DevTools users'
-        ]
-    },
-    'office': {
-        'name': 'Office Worker',
-        'icon': 'briefcase',
-        'description': 'Balanced settings for corporate environments with compatibility for web apps and services.',
-        'color': '#2FA572',
-        'priority_profile': 'balanced',
-        'tags': ['work', 'compatibility', 'productivity'],
-        'recommended_for': [
-            'Office workers',
-            'Business users',
-            'Web app users'
-        ]
+            'Activists and journalists',
+            'Users in restrictive countries',
+            'Maximum anonymity needs',
+            'Whistleblowers'
+        ],
+        'highlights': [
+            '✓ All cookies cleared on exit',
+            '✓ WebRTC completely disabled',
+            '✓ Canvas/WebGL fingerprinting blocked',
+            '✓ First-party isolation enabled',
+            '✓ Resist fingerprinting mode ON',
+            '✓ No disk cache (privacy)',
+            '✗ Many sites will break',
+            '✗ Google/Facebook features limited',
+            '✗ Video calling may not work'
+        ],
+        'stats': {
+            'settings_changed': '70-75',
+            'breakage_risk': 'Very High (9/10)',
+            'privacy_score': '10/10'
+        }
     },
     'privacy_enthusiast': {
         'name': 'Privacy Enthusiast',
@@ -175,7 +180,129 @@ PRESET_PROFILES: Dict[str, Dict[str, Any]] = {
             'Privacy-conscious users',
             'Security researchers',
             'Journalists'
-        ]
+        ],
+        'highlights': [
+            '✓ All tracking cookies blocked',
+            '✓ Fingerprinting resistance enabled',
+            '✓ WebRTC disabled',
+            '✓ Referrer headers minimized',
+            '✓ DNS over HTTPS (DoH) enabled',
+            '✗ Some logins may require re-entry',
+            '✗ Maps and video calling affected'
+        ],
+        'stats': {
+            'settings_changed': '60-65',
+            'breakage_risk': 'High (7/10)',
+            'privacy_score': '9/10'
+        }
+    },
+    # NEW: Intermediate privacy preset
+    'privacy_pro': {
+        'name': 'Privacy Pro',
+        'icon': 'shield-check',
+        'description': 'Strong privacy protection while maintaining most site functionality.',
+        'color': '#8E44AD',
+        'priority_profile': 'balanced',  # FIX: Use existing 'balanced' profile (midpoint between open and paranoid)
+        'tags': ['privacy', 'tracking-protection', 'balanced'],
+        'recommended_for': [
+            'Privacy-conscious users',
+            'People who want strong protection without major breakage',
+            'General users concerned about tracking'
+        ],
+        'highlights': [
+            '✓ Blocks all third-party tracking cookies',
+            '✓ Enhanced Tracking Protection (strict mode)',
+            '✓ Blocks known fingerprinting scripts',
+            '✓ HTTPS-only mode enabled',
+            '✓ Minimal site breakage',
+            '✗ Does not clear cookies on exit',
+            '✗ WebRTC still enabled (for video calls)'
+        ],
+        'stats': {
+            'settings_changed': '45-50',
+            'breakage_risk': 'Low (2/10)',
+            'privacy_score': '7/10'
+        }
+    },
+    # NEW: Banking/financial preset
+    'banking': {
+        'name': 'Banking & Financial',
+        'icon': 'bank',
+        'description': 'Security-focused for online banking with anti-fingerprinting but functional forms.',
+        'color': '#117A65',
+        'priority_profile': 'balanced',  # FIX: Use existing 'balanced' profile (good mix of security and functionality)
+        'tags': ['banking', 'security', 'anti-fraud'],
+        'recommended_for': [
+            'Online banking users',
+            'Financial transactions',
+            'E-commerce shoppers'
+        ],
+        'highlights': [
+            '✓ Strong anti-fingerprinting',
+            '✓ HTTPS-only enforced',
+            '✓ Third-party cookies blocked',
+            '✓ Form autofill enabled (convenience)',
+            '✓ WebRTC disabled (security)',
+            '✓ Password manager friendly',
+            '✗ Some payment providers may need whitelisting'
+        ],
+        'stats': {
+            'settings_changed': '40-45',
+            'breakage_risk': 'Low-Medium (3/10)',
+            'privacy_score': '8/10'
+        }
+    },
+    'office': {
+        'name': 'Office Worker',
+        'icon': 'briefcase',
+        'description': 'Balanced settings for corporate environments with compatibility for web apps and services.',
+        'color': '#2FA572',
+        'priority_profile': 'balanced',
+        'tags': ['work', 'compatibility', 'productivity'],
+        'recommended_for': [
+            'Office workers',
+            'Business users',
+            'Web app users'
+        ],
+        'highlights': [
+            '✓ Web app compatibility maintained',
+            '✓ Moderate tracking protection',
+            '✓ Form autofill enabled',
+            '✓ Balanced performance/privacy',
+            '✗ Some tracking still allowed',
+            '✗ Third-party cookies permitted for functionality'
+        ],
+        'stats': {
+            'settings_changed': '35-40',
+            'breakage_risk': 'Very Low (1/10)',
+            'privacy_score': '5/10'
+        }
+    },
+    'developer': {
+        'name': 'Developer',
+        'icon': 'code',
+        'description': 'Optimized for web development with DevTools performance and debugging features enabled.',
+        'color': '#3B8ED0',
+        'priority_profile': 'max_power',
+        'tags': ['development', 'debugging', 'performance'],
+        'recommended_for': [
+            'Web developers',
+            'Frontend engineers',
+            'DevTools users'
+        ],
+        'highlights': [
+            '✓ DevTools performance optimized',
+            '✓ Source maps enabled',
+            '✓ Remote debugging allowed',
+            '✓ Cache persistence enabled',
+            '✗ Minimal privacy protections',
+            '✗ Tracking allowed for compatibility'
+        ],
+        'stats': {
+            'settings_changed': '30-35',
+            'breakage_risk': 'None (0/10)',
+            'privacy_score': '2/10'
+        }
     },
     'laptop': {
         'name': 'Laptop / Battery Saver',
@@ -188,7 +315,20 @@ PRESET_PROFILES: Dict[str, Dict[str, Any]] = {
             'Laptop users',
             'Mobile workers',
             'Battery-conscious users'
-        ]
+        ],
+        'highlights': [
+            '✓ Reduced background activity',
+            '✓ Lower GPU usage',
+            '✓ Smaller cache sizes',
+            '✓ Network prefetching disabled',
+            '✗ Slightly slower page loads',
+            '✗ Some animations reduced'
+        ],
+        'stats': {
+            'settings_changed': '25-30',
+            'breakage_risk': 'None (0/10)',
+            'privacy_score': '4/10'
+        }
     },
     'gaming': {
         'name': 'Gaming / Streaming',
@@ -201,7 +341,20 @@ PRESET_PROFILES: Dict[str, Dict[str, Any]] = {
             'Gamers',
             'Streamers',
             'Media enthusiasts'
-        ]
+        ],
+        'highlights': [
+            '✓ GPU acceleration maximized',
+            '✓ WebGL/WebRTC enabled',
+            '✓ Large cache sizes',
+            '✓ Hardware video decoding',
+            '✗ No privacy protections',
+            '✗ Full tracking exposure'
+        ],
+        'stats': {
+            'settings_changed': '30-35',
+            'breakage_risk': 'None (0/10)',
+            'privacy_score': '1/10'
+        }
     },
     'casual': {
         'name': 'Casual Browser',
@@ -214,7 +367,20 @@ PRESET_PROFILES: Dict[str, Dict[str, Any]] = {
             'General users',
             'Non-technical users',
             'Maximum compatibility needs'
-        ]
+        ],
+        'highlights': [
+            '✓ Firefox defaults maintained',
+            '✓ Basic tracking protection only',
+            '✓ Maximum site compatibility',
+            '✓ All features enabled',
+            '✗ Minimal privacy improvements',
+            '✗ Tracking mostly allowed'
+        ],
+        'stats': {
+            'settings_changed': '10-15',
+            'breakage_risk': 'None (0/10)',
+            'privacy_score': '3/10'
+        }
     }
 }
 

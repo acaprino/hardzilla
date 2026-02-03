@@ -1,49 +1,87 @@
 @echo off
-echo ========================================
-echo Hardzilla - Firefox Hardening Tool
-echo ========================================
+REM ============================================================
+REM  Hardzilla v4.0 - Firefox Hardening Tool
+REM  Launcher Script
+REM ============================================================
+
+title Hardzilla v4.0 Launcher
+
+echo.
+echo ============================================================
+echo  Hardzilla v4.0 - Firefox Hardening Tool
+echo  Clean Architecture Edition
+echo ============================================================
 echo.
 
-REM Check Python
+REM Check if Python is installed
 python --version >nul 2>&1
-if errorlevel 1 (
-    echo ERROR: Python not found!
-    echo Please install Python from https://python.org
+if %errorlevel% neq 0 (
+    echo [ERROR] Python is not installed or not in PATH
+    echo.
+    echo Please install Python 3.9+ from https://www.python.org/
+    echo Make sure to check "Add Python to PATH" during installation
+    echo.
     pause
     exit /b 1
 )
 
-REM Install dependencies if not present
-echo Checking dependencies...
-pip show customtkinter >nul 2>&1
-if errorlevel 1 (
-    echo Installing customtkinter...
-    pip install customtkinter --quiet
-)
-
-pip show pywinstyles >nul 2>&1
-if errorlevel 1 (
-    echo Installing pywinstyles ^(Windows acrylic effect^)...
-    pip install pywinstyles --quiet
-)
-
-echo Starting Hardzilla...
-echo.
-echo FEATURES:
-echo - Individual control over each data type
-echo - Choose exactly what to keep and what to delete
-echo - Session restore settings
-echo - Cookie management
-echo - Network and security options
-echo - Permission controls
+REM Display Python version
+echo [1/3] Checking Python installation...
+for /f "tokens=*" %%i in ('python --version') do set PYTHON_VERSION=%%i
+echo       %PYTHON_VERSION% - OK
 echo.
 
-python hardzilla.py
-
-if errorlevel 1 (
+REM Check Python version (requires 3.9+)
+python -c "import sys; exit(0 if sys.version_info >= (3, 9) else 1)" >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] Python 3.9 or higher is required
+    echo        Current version: %PYTHON_VERSION%
     echo.
-    echo Hardzilla encountered an error.
     pause
+    exit /b 1
 )
 
-exit /b 0
+REM Check for required packages
+echo [2/3] Checking dependencies...
+
+REM Check for customtkinter (will be needed for GUI in Phase 4)
+python -c "import customtkinter" >nul 2>&1
+if %errorlevel% neq 0 (
+    echo       [!] customtkinter not installed (will be needed for GUI)
+    echo       [*] Installing customtkinter...
+    pip install customtkinter --quiet
+    if %errorlevel% neq 0 (
+        echo       [ERROR] Failed to install customtkinter
+        pause
+        exit /b 1
+    )
+    echo       [OK] customtkinter installed
+) else (
+    echo       [OK] customtkinter installed
+)
+
+echo.
+echo [3/3] All dependencies satisfied!
+echo.
+echo ============================================================
+echo  Launching Hardzilla v4.0...
+echo ============================================================
+
+REM Launch the GUI application
+python hardzilla_gui.py %*
+
+REM Show exit status
+if %errorlevel% equ 0 (
+    echo.
+    echo ============================================================
+    echo  Application exited successfully
+    echo ============================================================
+) else (
+    echo.
+    echo ============================================================
+    echo  Application exited with error code: %errorlevel%
+    echo ============================================================
+)
+
+echo.
+pause

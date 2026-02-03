@@ -11,11 +11,12 @@ from pathlib import Path
 from hardzilla.presentation.view_models import ApplyViewModel
 
 
-class ApplyView(ctk.CTkFrame):
+class ApplyView(ctk.CTkScrollableFrame):
     """
-    Screen 3: Apply Settings View.
+    Apply to Firefox View.
 
     Final screen where user applies settings to Firefox profile.
+    SCROLLABLE to accommodate all content including apply button.
     """
 
     def __init__(
@@ -65,7 +66,7 @@ class ApplyView(ctk.CTkFrame):
         """Build screen header"""
         header = ctk.CTkLabel(
             self,
-            text="Step 3: Apply Configuration",
+            text="Apply to Firefox",
             font=ctk.CTkFont(size=20, weight="bold")
         )
         header.grid(row=0, column=0, pady=(0, 20), sticky="w")
