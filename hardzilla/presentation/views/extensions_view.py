@@ -9,12 +9,12 @@ from tkinter import messagebox
 from typing import Callable
 
 from hardzilla.presentation.view_models import ApplyViewModel
-
-logger = logging.getLogger(__name__)
 from hardzilla.presentation.theme import Theme
 from hardzilla.metadata.extensions_metadata import EXTENSIONS_METADATA
 from hardzilla.domain.entities.extension import Extension
 from hardzilla.presentation.widgets.extension_row import ExtensionRow
+
+logger = logging.getLogger(__name__)
 
 
 class ExtensionsView(ctk.CTkFrame):
@@ -55,6 +55,13 @@ class ExtensionsView(ctk.CTkFrame):
         self.view_model.subscribe('extension_install_success', self._on_extension_install_complete)
         self.view_model.subscribe('is_installing_extensions', self._on_extension_installing_changed)
         logger.debug("ExtensionsView.__init__: initialization complete, %d extension rows created", len(self.extension_rows))
+
+    def destroy(self):
+        """Clean up ViewModel subscriptions before destroying widget."""
+        logger.debug("ExtensionsView.destroy: unsubscribing from ViewModel events")
+        self.view_model.unsubscribe('extension_install_success', self._on_extension_install_complete)
+        self.view_model.unsubscribe('is_installing_extensions', self._on_extension_installing_changed)
+        super().destroy()
 
     def _build_header(self):
         """Build screen header."""
@@ -278,7 +285,7 @@ class ExtensionsView(ctk.CTkFrame):
         """Handle extension installation completion."""
         logger.debug("_on_extension_install_complete: success=%s", success)
         if not success:
-            error_msg = self.view_model.error_message or "Unknown error occurred"
+            error_msg = self.view_model.extension_error_message or "Unknown error occurred"
             logger.error("_on_extension_install_complete: installation failed - %s", error_msg)
             self.extension_status_label.configure(
                 text="\u2717 Extension installation failed",

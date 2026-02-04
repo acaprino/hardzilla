@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Apply Controller
-Handles logic for Screen 3 (Apply Settings)
+Handles logic for Screen 4 (Apply Settings) and Screen 3 (Extensions)
 """
 
 import logging
@@ -148,9 +148,9 @@ class ApplyController:
             if success is not None:
                 self.view_model.apply_success = success
             if error is not None:
-                self.view_model.error_message = error
+                self.view_model.apply_error_message = error
             else:
-                self.view_model.error_message = ""
+                self.view_model.apply_error_message = ""
 
         # Schedule on main thread if callback provided, otherwise run directly
         if self.ui_callback:
@@ -249,14 +249,18 @@ class ApplyController:
         def update():
             if is_installing is not None:
                 self.view_model.is_installing_extensions = is_installing
+            # SET RESULTS FIRST - before triggering success subscription
+            # The success subscriber reads extension_install_results immediately,
+            # so results must be populated before extension_install_success fires.
             if results is not None:
                 self.view_model.extension_install_results = results
+            # NOW set success - subscription will see updated results
             if success is not None:
                 self.view_model.extension_install_success = success
             if error is not None:
-                self.view_model.error_message = error
+                self.view_model.extension_error_message = error
             else:
-                self.view_model.error_message = ""
+                self.view_model.extension_error_message = ""
 
         # Schedule on main thread if callback provided
         if self.ui_callback:

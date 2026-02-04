@@ -6,13 +6,18 @@ Main entry point for the graphical user interface
 
 import sys
 import logging
+import argparse
 from pathlib import Path
 import json
 import customtkinter as ctk
 
-# Configure logging
+# Configure logging (--debug flag enables DEBUG level)
+_parser = argparse.ArgumentParser(add_help=False)
+_parser.add_argument('--debug', '-v', action='store_true', help='Enable debug logging')
+_args, _ = _parser.parse_known_args()
+
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.DEBUG if _args.debug else logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -143,7 +148,7 @@ class HardzillaGUI(ctk.CTk):
         header.pack(fill="x", padx=20, pady=20)
 
         # Tabview (replaces wizard navigation)
-        self.tabview = ctk.CTkTabview(main_frame, height=700)
+        self.tabview = ctk.CTkTabview(main_frame, height=700, command=self._on_tab_changed)
         self.tabview.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
         # Create tabs
@@ -265,6 +270,36 @@ class HardzillaGUI(ctk.CTk):
         """
         self.after(0, callback)
 
+    # Tab change and state sync
+    def _on_tab_changed(self):
+        """Sync ViewModel state when user clicks tabs directly."""
+        current = self.tabview.get()
+        logger.debug("_on_tab_changed: switched to '%s'", current)
+        if current in ("Extensions", "Apply to Firefox"):
+            self._sync_apply_vm()
+
+    def _sync_apply_vm(self):
+        """Ensure apply_vm has the latest profile and firefox_path from other ViewModels."""
+        from hardzilla.domain.entities import Profile
+
+        # Sync firefox_path
+        if self.setup_vm.firefox_path and self.apply_vm.firefox_path != self.setup_vm.firefox_path:
+            logger.debug("_sync_apply_vm: syncing firefox_path from setup_vm: %s", self.setup_vm.firefox_path)
+            self.apply_vm.firefox_path = self.setup_vm.firefox_path
+
+        # Sync profile from customize_vm settings if apply_vm has no profile yet
+        if not self.apply_vm.profile and self.customize_vm.settings:
+            profile_name = self.customize_vm.profile.name if self.customize_vm.profile else "Custom Configuration"
+            profile = Profile(
+                name=profile_name,
+                settings=self.customize_vm.settings.copy(),
+                metadata={},
+                generated_by="user_customization"
+            )
+            self.apply_vm.profile = profile
+            logger.debug("_sync_apply_vm: synced profile '%s' (%d settings) from customize_vm",
+                          profile.name, len(profile.settings))
+
     # Event handlers
     def _on_preset_selected(self, preset_key: str):
         """Handle preset selection - update customize settings"""
@@ -332,6 +367,11 @@ class HardzillaGUI(ctk.CTk):
 
     def _on_firefox_path_changed(self, path: str):
         """Handle Firefox path selection - import current settings"""
+        logger.debug("_on_firefox_path_changed: path=%s", path)
+        # Sync firefox_path to apply_vm immediately so Extensions tab can use it
+        # regardless of navigation flow (direct tab click vs Next button)
+        self.apply_vm.firefox_path = path
+        logger.debug("_on_firefox_path_changed: apply_vm.firefox_path synced")
         try:
             self.setup_controller.handle_firefox_path_changed(path)
         except Exception as e:

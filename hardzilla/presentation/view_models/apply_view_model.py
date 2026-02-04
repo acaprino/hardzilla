@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Apply ViewModel
-State management for Screen 3 (Apply Settings)
+State management for Screen 4 (Apply Settings) and Screen 3 (Extensions)
 """
 
 from pathlib import Path
@@ -13,7 +13,7 @@ from hardzilla.domain.enums import SettingLevel
 
 class ApplyViewModel(BaseViewModel):
     """
-    ViewModel for the Apply screen (Screen 3).
+    ViewModel for Apply (Screen 4) and Extensions (Screen 3).
 
     Properties:
     - profile: Profile to apply
@@ -23,7 +23,8 @@ class ApplyViewModel(BaseViewModel):
     - json_save_path: Path to save JSON file
     - is_applying: Boolean indicating apply in progress
     - apply_success: Boolean indicating successful application
-    - error_message: Error message if apply failed
+    - apply_error_message: Error message if apply failed
+    - extension_error_message: Error message if extension install failed
     """
 
     def __init__(self):
@@ -38,7 +39,7 @@ class ApplyViewModel(BaseViewModel):
             'json_save_path': '',
             'is_applying': False,
             'apply_success': False,
-            'error_message': '',
+            'apply_error_message': '',
             'base_count': 0,
             'advanced_count': 0,
             'applied_base_count': 0,
@@ -47,7 +48,8 @@ class ApplyViewModel(BaseViewModel):
             'selected_extensions': [],
             'is_installing_extensions': False,
             'extension_install_success': False,
-            'extension_install_results': {}
+            'extension_install_results': {},
+            'extension_error_message': ''
         }
 
     # Profile
@@ -127,12 +129,20 @@ class ApplyViewModel(BaseViewModel):
         self.set_property('apply_success', value)
 
     @property
-    def error_message(self) -> str:
-        return self.get_property('error_message', '')
+    def apply_error_message(self) -> str:
+        return self.get_property('apply_error_message', '')
 
-    @error_message.setter
-    def error_message(self, value: str):
-        self.set_property('error_message', value)
+    @apply_error_message.setter
+    def apply_error_message(self, value: str):
+        self.set_property('apply_error_message', value)
+
+    @property
+    def extension_error_message(self) -> str:
+        return self.get_property('extension_error_message', '')
+
+    @extension_error_message.setter
+    def extension_error_message(self, value: str):
+        self.set_property('extension_error_message', value)
 
     # Counts
     @property

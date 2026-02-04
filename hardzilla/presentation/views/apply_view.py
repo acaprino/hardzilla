@@ -3,11 +3,14 @@
 Apply View - Screen 4 (Apply Settings to Firefox)
 """
 
+import logging
 import customtkinter as ctk
 from tkinter import messagebox
 from typing import Callable
 
 from hardzilla.presentation.view_models import ApplyViewModel
+
+logger = logging.getLogger(__name__)
 
 
 class ApplyView(ctk.CTkScrollableFrame):
@@ -34,6 +37,7 @@ class ApplyView(ctk.CTkScrollableFrame):
             on_apply: Callback for Apply button
             on_back: Callback for Back button
         """
+        logger.debug("ApplyView.__init__: starting initialization")
         super().__init__(parent)
         self.view_model = view_model
         self.on_apply = on_apply
@@ -50,10 +54,20 @@ class ApplyView(ctk.CTkScrollableFrame):
 
         # Subscribe to view model changes
         self.view_model.subscribe('apply_success', self._on_apply_complete)
-        self.view_model.subscribe('error_message', self._on_error)
+        self.view_model.subscribe('apply_error_message', self._on_error)
         # Subscribe to count changes for reactive summary updates
         self.view_model.subscribe('base_count', self._on_counts_updated)
         self.view_model.subscribe('advanced_count', self._on_counts_updated)
+        logger.debug("ApplyView.__init__: initialization complete")
+
+    def destroy(self):
+        """Clean up ViewModel subscriptions before destroying widget."""
+        logger.debug("ApplyView.destroy: unsubscribing from ViewModel events")
+        self.view_model.unsubscribe('apply_success', self._on_apply_complete)
+        self.view_model.unsubscribe('apply_error_message', self._on_error)
+        self.view_model.unsubscribe('base_count', self._on_counts_updated)
+        self.view_model.unsubscribe('advanced_count', self._on_counts_updated)
+        super().destroy()
 
     def _build_header(self):
         """Build screen header"""
@@ -219,6 +233,11 @@ class ApplyView(ctk.CTkScrollableFrame):
 
     def _on_apply_clicked(self):
         """Handle apply button click"""
+        logger.debug("_on_apply_clicked: button pressed")
+        logger.debug("_on_apply_clicked: profile=%s, firefox_path=%s, mode=%s",
+                      self.view_model.profile.name if self.view_model.profile else None,
+                      self.view_model.firefox_path,
+                      self.view_model.apply_mode)
         # Update profile name from entry field
         new_name = self.profile_name_entry.get().strip()
         if new_name and self.view_model.profile:
@@ -233,8 +252,10 @@ class ApplyView(ctk.CTkScrollableFrame):
             "Continue?",
             icon='warning'
         ):
+            logger.debug("_on_apply_clicked: user cancelled")
             return
 
+        logger.info("_on_apply_clicked: user confirmed, applying settings")
         # Disable button
         self.apply_btn.configure(state="disabled", text="Applying...")
 
@@ -247,6 +268,7 @@ class ApplyView(ctk.CTkScrollableFrame):
 
     def _on_apply_complete(self, success: bool):
         """Handle apply completion"""
+        logger.debug("_on_apply_complete: success=%s", success)
         self.apply_btn.configure(state="normal", text="Apply Settings")
 
         if success:
@@ -263,7 +285,8 @@ class ApplyView(ctk.CTkScrollableFrame):
             )
 
     def _on_error(self, error_msg: str):
-        """Handle error"""
+        """Handle apply error"""
         if error_msg:
+            logger.error("_on_error: %s", error_msg)
             messagebox.showerror("Error", error_msg)
 
