@@ -42,6 +42,7 @@ class UtilitiesController:
         self.ui_callback = ui_callback
         self._convert_thread: Optional[threading.Thread] = None
         self._detect_thread: Optional[threading.Thread] = None
+        self._estimate_thread: Optional[threading.Thread] = None
         self._cancel_event = threading.Event()
 
     def detect_firefox_installation(self, profile_path: Optional[str] = None) -> None:
@@ -89,12 +90,16 @@ class UtilitiesController:
 
     def estimate_size(self) -> None:
         """Update ViewModel with estimated portable size in a background thread."""
-        thread = threading.Thread(
+        # Prevent overlapping estimation threads
+        if hasattr(self, '_estimate_thread') and self._estimate_thread and self._estimate_thread.is_alive():
+            return
+
+        self._estimate_thread = threading.Thread(
             target=self._estimate_size_sync,
             daemon=True,
             name="EstimateSizeThread"
         )
-        thread.start()
+        self._estimate_thread.start()
 
     def _estimate_size_sync(self) -> None:
         """Synchronous size estimation (runs on background thread)."""

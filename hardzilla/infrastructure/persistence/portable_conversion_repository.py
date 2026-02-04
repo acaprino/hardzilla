@@ -62,7 +62,7 @@ class PortableConversionRepository:
                 progress_cb("Creating directory structure...", 0.0)
 
             if cancel_event and cancel_event.is_set():
-                return self._cancelled_result()
+                return self._cancelled_result(0, dest_dir)
 
             self._create_directory_structure(dest_dir)
 
@@ -87,7 +87,7 @@ class PortableConversionRepository:
             all_failed.extend(failed)
 
             if cancel_event and cancel_event.is_set():
-                return self._cancelled_result()
+                return self._cancelled_result(files_copied, dest_dir)
 
             # Phase 3: Copy profile (20%) - optional
             if profile_path and profile_path.exists():
@@ -108,7 +108,7 @@ class PortableConversionRepository:
                 all_failed.extend(failed)
 
             if cancel_event and cancel_event.is_set():
-                return self._cancelled_result()
+                return self._cancelled_result(files_copied, dest_dir)
 
             # Phase 4: Finalize (5%)
             if progress_cb:
@@ -309,16 +309,14 @@ class PortableConversionRepository:
         total_bytes = 0
         failed_files: List[str] = []
 
-        # Estimate total file count for progress (fast stat-based count)
-        estimated_total = 0
+        # Estimate file count from source directory size heuristic
+        # to avoid a separate full rglob pass over the tree
         try:
-            for _ in src.rglob('*'):
-                estimated_total += 1
+            src_size = sum(1 for _ in src.iterdir())
+            # Rough estimate: avg ~15 files per top-level entry
+            estimated_total = max(src_size * 15, 50)
         except OSError:
-            estimated_total = 100  # fallback estimate
-
-        if estimated_total == 0:
-            return 0, 0, []
+            estimated_total = 100
 
         processed = 0
 
@@ -332,6 +330,9 @@ class PortableConversionRepository:
             rel_path = os.path.relpath(root, src)
             dest_root = dst / rel_path
             dest_root.mkdir(parents=True, exist_ok=True)
+
+            # Refine estimate as we discover actual file counts
+            estimated_total = max(estimated_total, processed + len(files) + 1)
 
             for filename in files:
                 # Check cancellation per-file
@@ -350,13 +351,13 @@ class PortableConversionRepository:
                     files_copied += 1
 
                     if progress_cb and estimated_total > 0:
-                        file_progress = min(processed / estimated_total, 1.0)
+                        file_progress = min(processed / estimated_total, 0.99)
                         overall = phase_start + (file_progress * phase_weight)
                         display_name = filename
                         if len(display_name) > 40:
                             display_name = display_name[:37] + "..."
                         progress_cb(
-                            f"Copying: {display_name} ({files_copied}/{estimated_total})",
+                            f"Copying: {display_name} ({files_copied})",
                             overall
                         )
                 except (PermissionError, OSError) as e:
@@ -410,7 +411,7 @@ class PortableConversionRepository:
         bat_content += 'endlocal\r\n'
 
         bat_path = dest_dir / "FirefoxPortable.bat"
-        bat_path.write_text(bat_content, encoding='utf-8')
+        bat_path.write_bytes(bat_content.encode('ascii'))
         logger.info(f"Created launcher: {bat_path}")
 
     def _check_disk_space(self, dest_path: Path, required_mb: float) -> Optional[str]:
@@ -451,11 +452,14 @@ class PortableConversionRepository:
             logger.warning(f"Error calculating size of {path}: {e}")
         return total
 
-    def _cancelled_result(self) -> Dict:
-        """Create a standard cancellation result dict."""
+    def _cancelled_result(self, files_copied: int = 0, dest_dir: Path = None) -> Dict:
+        """Create a standard cancellation result dict and clean up partial files."""
+        if dest_dir and dest_dir.exists():
+            logger.info(f"Cleaning up partial conversion at: {dest_dir}")
+            shutil.rmtree(str(dest_dir), ignore_errors=True)
         return {
             "success": False,
-            "files_copied": 0,
+            "files_copied": files_copied,
             "files_failed": 0,
             "failed_files": [],
             "size_mb": 0,

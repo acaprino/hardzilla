@@ -51,18 +51,24 @@ def extract_firefox_icon(output_ico: Path) -> bool:
 
 
 def _extract_icon_powershell(exe_path: str, output_ico: Path) -> bool:
-    """Extract icon from exe using PowerShell."""
-    # Extract as PNG via PowerShell, then convert to ICO with Pillow
+    """Extract icon from exe using PowerShell with encoded command to avoid injection."""
+    import base64
+
     with tempfile.TemporaryDirectory() as tmpdir:
         png_path = Path(tmpdir) / "icon.png"
-        ps_script = f"""
-Add-Type -AssemblyName System.Drawing
-$icon = [System.Drawing.Icon]::ExtractAssociatedIcon("{exe_path}")
-$bmp = $icon.ToBitmap()
-$bmp.Save("{str(png_path).replace(chr(92), '/')}", [System.Drawing.Imaging.ImageFormat]::Png)
-"""
+        # Use forward slashes to avoid PowerShell escape issues
+        exe_path_safe = exe_path.replace("\\", "/")
+        png_path_safe = str(png_path).replace("\\", "/")
+        ps_script = (
+            "Add-Type -AssemblyName System.Drawing\n"
+            f"$icon = [System.Drawing.Icon]::ExtractAssociatedIcon('{exe_path_safe}')\n"
+            "$bmp = $icon.ToBitmap()\n"
+            f"$bmp.Save('{png_path_safe}', [System.Drawing.Imaging.ImageFormat]::Png)\n"
+        )
+        # Encode as UTF-16LE for PowerShell -EncodedCommand
+        encoded = base64.b64encode(ps_script.encode("utf-16-le")).decode("ascii")
         result = subprocess.run(
-            ["powershell", "-NoProfile", "-Command", ps_script],
+            ["powershell", "-NoProfile", "-EncodedCommand", encoded],
             capture_output=True, text=True
         )
         if result.returncode != 0 or not png_path.exists():

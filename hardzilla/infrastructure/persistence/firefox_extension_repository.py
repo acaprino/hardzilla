@@ -11,10 +11,7 @@ from datetime import datetime
 from hardzilla.domain.repositories.i_extension_repository import IExtensionRepository
 from hardzilla.domain.enums.extension_status import InstallationStatus
 from hardzilla.metadata.extensions_metadata import EXTENSIONS_METADATA
-from hardzilla.infrastructure.persistence.firefox_detection import (
-    get_firefox_installation_dir,
-    detect_firefox_portable
-)
+from hardzilla.infrastructure.persistence.firefox_detection import get_firefox_installation_dir
 
 logger = logging.getLogger(__name__)
 
@@ -82,9 +79,17 @@ class FirefoxExtensionRepository(IExtensionRepository):
                     continue
 
                 ext_data = EXTENSIONS_METADATA[ext_id]
+                install_url = ext_data["install_url"]
+
+                # Validate URL is from official Mozilla add-ons
+                if not install_url.startswith("https://addons.mozilla.org/"):
+                    logger.error(f"Rejected non-AMO install URL for {ext_id}: {install_url}")
+                    results[ext_id] = InstallationStatus.FAILED
+                    continue
+
                 extension_settings[ext_id] = {
                     "installation_mode": "normal_installed",
-                    "install_url": ext_data["install_url"]
+                    "install_url": install_url
                 }
                 results[ext_id] = InstallationStatus.PENDING
 

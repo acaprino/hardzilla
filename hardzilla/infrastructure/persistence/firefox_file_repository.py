@@ -103,7 +103,31 @@ class FirefoxFileRepository(IFirefoxRepository):
         shutil.copy2(pref_file, backup_file)
         logger.info(f"Created backup: {backup_file.name}")
 
+        # Rotate old backups (keep last 5)
+        self._rotate_backups(profile_path, level.filename, max_backups=5)
+
         return backup_file
+
+    def _rotate_backups(self, directory: Path, filename: str, max_backups: int = 5) -> None:
+        """
+        Remove old backup files, keeping only the most recent ones.
+
+        Args:
+            directory: Directory containing backup files
+            filename: Base filename (e.g. 'prefs.js' or 'user.js')
+            max_backups: Maximum number of backups to keep
+        """
+        try:
+            backup_files = sorted(
+                directory.glob(f"{filename}.backup_*"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True
+            )
+            for old_backup in backup_files[max_backups:]:
+                old_backup.unlink()
+                logger.info(f"Removed old backup: {old_backup.name}")
+        except Exception as e:
+            logger.error(f"Failed to rotate backups: {e}")
 
     def validate_profile_path(self, profile_path: Path) -> bool:
         """

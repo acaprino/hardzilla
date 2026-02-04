@@ -1,7 +1,14 @@
 """
-FirefoxPortable launcher - launches Firefox with a portable profile.
+MyFox portable launcher - launches Firefox with a portable profile.
 
-Compiled to FirefoxPortable.exe with PyInstaller.
+Compiled to MyFox.exe with PyInstaller.
+
+Security note: This launcher executes whatever firefox.exe it finds at
+App/Firefox64/firefox.exe (or App/Firefox/firefox.exe). It does NOT verify
+the binary's Authenticode signature or hash. This is the same trust model
+used by PortableApps.com and similar portable launchers. Users should ensure
+the portable installation directory is not on a shared/untrusted drive, as
+a replaced firefox.exe binary would be executed without verification.
 """
 import os
 import sys
