@@ -12,7 +12,7 @@ import customtkinter as ctk
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ from hardzilla.presentation.view_models import (
 from hardzilla.presentation.views import (
     SetupView,
     CustomizeView,
+    ExtensionsView,
     ApplyView
 )
 from hardzilla.presentation.controllers import (
@@ -42,10 +43,11 @@ class HardzillaGUI(ctk.CTk):
     """
     Main GUI application for Hardzilla v4.0.
 
-    Implements a 3-tab interface:
+    Implements a 4-tab interface:
     1. Setup & Presets - Choose profile and Firefox path
     2. Customize Settings - Review and modify settings
-    3. Apply to Firefox - Apply configuration to Firefox
+    3. Extensions - Select and install privacy extensions
+    4. Apply to Firefox - Apply configuration to Firefox
     """
 
     def __init__(self):
@@ -147,6 +149,7 @@ class HardzillaGUI(ctk.CTk):
         # Create tabs
         self.tabview.add("Setup & Presets")
         self.tabview.add("Customize Settings")
+        self.tabview.add("Extensions")
         self.tabview.add("Apply to Firefox")
 
         # Create content in each tab
@@ -195,6 +198,7 @@ class HardzillaGUI(ctk.CTk):
 
     def _create_tab_content(self):
         """Create content for each tab"""
+        logger.debug("_create_tab_content: creating views for all 4 tabs")
         # Tab 1: Setup & Presets
         self.setup_view = SetupView(
             parent=self.tabview.tab("Setup & Presets"),
@@ -217,12 +221,22 @@ class HardzillaGUI(ctk.CTk):
         )
         self.customize_view.pack(fill="both", expand=True)
 
-        # Tab 3: Apply to Firefox
+        logger.debug("_create_tab_content: creating ExtensionsView (Tab 3)")
+        # Tab 3: Extensions
+        self.extensions_view = ExtensionsView(
+            parent=self.tabview.tab("Extensions"),
+            view_model=self.apply_vm,
+            on_install_extensions=self._on_install_extensions,
+            on_next=self._on_extensions_next,
+            on_back=self._on_extensions_back
+        )
+        self.extensions_view.pack(fill="both", expand=True)
+
+        # Tab 4: Apply to Firefox
         self.apply_view = ApplyView(
             parent=self.tabview.tab("Apply to Firefox"),
             view_model=self.apply_vm,
             on_apply=self._on_apply,
-            on_install_extensions=self._on_install_extensions,
             on_back=self._on_apply_back
         )
         self.apply_view.pack(fill="both", expand=True)
@@ -381,10 +395,12 @@ class HardzillaGUI(ctk.CTk):
 
     def _on_customize_next(self):
         """Handle next from customize tab"""
+        logger.debug("_on_customize_next: navigating from Customize Settings to Extensions")
         from hardzilla.domain.entities import Profile
 
         # Build profile from current ViewModel settings (includes user modifications)
         settings = self.customize_vm.settings
+        logger.debug("_on_customize_next: customize_vm has %d settings", len(settings) if settings else 0)
 
         if not settings:
             self._show_error(
@@ -402,10 +418,12 @@ class HardzillaGUI(ctk.CTk):
             generated_by="user_customization"
         )
 
-        # Pass to apply view
+        # Pass to apply view model
         self.apply_vm.profile = profile
         self.apply_vm.firefox_path = self.setup_vm.firefox_path
-        self.tabview.set("Apply to Firefox")
+        logger.debug("_on_customize_next: apply_vm.profile='%s' (%d settings), firefox_path=%s",
+                      profile.name, len(profile.settings), self.setup_vm.firefox_path)
+        self.tabview.set("Extensions")
 
     def _on_customize_back(self):
         """Handle back from customize tab"""
@@ -421,15 +439,30 @@ class HardzillaGUI(ctk.CTk):
 
     def _on_install_extensions(self):
         """Handle install extensions button"""
+        logger.debug("_on_install_extensions: delegating to apply_controller.handle_install_extensions()")
+        logger.debug("_on_install_extensions: selected_extensions=%s", self.apply_vm.selected_extensions)
+        logger.debug("_on_install_extensions: firefox_path=%s", self.apply_vm.firefox_path)
         try:
             self.apply_controller.handle_install_extensions()
         except Exception as e:
-            logger.error(f"Failed to install extensions: {e}")
+            logger.error(f"Failed to install extensions: {e}", exc_info=True)
             self._show_error("Failed to install extensions", str(e))
+
+    def _on_extensions_next(self):
+        """Handle next from extensions tab"""
+        logger.debug("_on_extensions_next: navigating Extensions -> Apply to Firefox")
+        logger.debug("_on_extensions_next: %d extensions selected", len(self.apply_vm.selected_extensions))
+        self.tabview.set("Apply to Firefox")
+
+    def _on_extensions_back(self):
+        """Handle back from extensions tab"""
+        logger.debug("_on_extensions_back: navigating Extensions -> Customize Settings")
+        self.tabview.set("Customize Settings")
 
     def _on_apply_back(self):
         """Handle back from apply tab"""
-        self.tabview.set("Customize Settings")
+        logger.debug("_on_apply_back: navigating Apply to Firefox -> Extensions")
+        self.tabview.set("Extensions")
 
     def _show_error(self, title: str, message: str):
         """Show error dialog"""
