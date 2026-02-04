@@ -11,6 +11,10 @@ from datetime import datetime
 from hardzilla.domain.repositories.i_extension_repository import IExtensionRepository
 from hardzilla.domain.enums.extension_status import InstallationStatus
 from hardzilla.metadata.extensions_metadata import EXTENSIONS_METADATA
+from hardzilla.infrastructure.persistence.firefox_detection import (
+    get_firefox_installation_dir,
+    detect_firefox_portable
+)
 
 logger = logging.getLogger(__name__)
 
@@ -109,9 +113,7 @@ class FirefoxExtensionRepository(IExtensionRepository):
         """
         Find Firefox installation directory from profile path.
 
-        Checks common installation paths across platforms and looks for
-        firefox.exe (Windows) or firefox (Linux/macOS) binary.
-        Also detects Firefox Portable installations.
+        Delegates to shared firefox_detection module.
 
         Args:
             profile_path: Path to Firefox profile
@@ -119,125 +121,7 @@ class FirefoxExtensionRepository(IExtensionRepository):
         Returns:
             Path to Firefox installation directory, or None if not found
         """
-        import platform
-        import os
-
-        system = platform.system()
-
-        # Determine binary name by platform
-        if system == "Windows":
-            binary_name = "firefox.exe"
-            portable_binary = "FirefoxPortable.exe"
-        elif system == "Linux":
-            binary_name = "firefox"
-            portable_binary = None  # Portable typically Windows-only
-        elif system == "Darwin":  # macOS
-            binary_name = "firefox"
-            portable_binary = None
-        else:
-            logger.warning(f"Unsupported platform: {system}")
-            return None
-
-        # Check if profile is inside a Firefox Portable installation
-        if system == "Windows":
-            portable_dir = self._detect_firefox_portable(profile_path, portable_binary, binary_name)
-            if portable_dir:
-                logger.info(f"Found Firefox Portable installation at: {portable_dir}")
-                return portable_dir
-
-        # Common Firefox installation paths by platform
-        if system == "Windows":
-            common_paths = [
-                Path("C:/Program Files/Mozilla Firefox"),
-                Path("C:/Program Files (x86)/Mozilla Firefox"),
-                Path(os.path.expandvars("%LOCALAPPDATA%/Mozilla Firefox")),
-            ]
-        elif system == "Linux":
-            common_paths = [
-                Path("/usr/lib/firefox"),
-                Path("/usr/lib64/firefox"),
-                Path("/opt/firefox"),
-                Path("/snap/firefox/current/usr/lib/firefox"),
-            ]
-        elif system == "Darwin":  # macOS
-            common_paths = [
-                Path("/Applications/Firefox.app/Contents/MacOS"),
-            ]
-
-        # Check common paths
-        for path in common_paths:
-            if path.exists() and (path / binary_name).exists():
-                logger.info(f"Found Firefox installation at: {path}")
-                return path
-
-        # On Windows, try registry lookup as fallback
-        if system == "Windows":
-            try:
-                import winreg
-                key = winreg.OpenKey(
-                    winreg.HKEY_LOCAL_MACHINE,
-                    r"SOFTWARE\Mozilla\Mozilla Firefox",
-                    0,
-                    winreg.KEY_READ
-                )
-                # Get default version subkey
-                version_key_name = winreg.EnumKey(key, 0)
-                version_key = winreg.OpenKey(key, version_key_name + r"\Main")
-                install_dir = winreg.QueryValueEx(version_key, "Install Directory")[0]
-                winreg.CloseKey(version_key)
-                winreg.CloseKey(key)
-
-                install_path = Path(install_dir)
-                if install_path.exists() and (install_path / binary_name).exists():
-                    logger.info(f"Found Firefox via registry at: {install_path}")
-                    return install_path
-            except (ImportError, OSError, WindowsError) as e:
-                logger.debug(f"Registry lookup failed: {e}")
-
-        logger.warning("Could not find Firefox installation directory")
-        return None
-
-    def _detect_firefox_portable(self, profile_path: Path, portable_binary: str, firefox_binary: str) -> Path:
-        """
-        Detect if the profile is inside a Firefox Portable installation.
-
-        Firefox Portable structure:
-        - FirefoxPortable/
-          - FirefoxPortable.exe
-          - App/Firefox64/firefox.exe (64-bit installation)
-          - App/Firefox/firefox.exe (32-bit installation, may be empty)
-          - Data/profile/ (user profile)
-
-        Args:
-            profile_path: Path to Firefox profile
-            portable_binary: Name of portable launcher (e.g., "FirefoxPortable.exe")
-            firefox_binary: Name of Firefox binary (e.g., "firefox.exe")
-
-        Returns:
-            Path to Firefox installation directory (App/Firefox64 or App/Firefox), or None if not portable
-        """
-        # Walk up the directory tree looking for FirefoxPortable.exe
-        current = profile_path.resolve()
-        max_depth = 10  # Limit search depth
-
-        for _ in range(max_depth):
-            parent = current.parent
-            if parent == current:  # Reached root
-                break
-
-            # Check if this directory contains FirefoxPortable.exe
-            portable_exe = parent / portable_binary
-            if portable_exe.exists():
-                # Found portable directory, check for Firefox installation
-                # Try Firefox64 first (64-bit), then Firefox (32-bit)
-                for firefox_dir_name in ["Firefox64", "Firefox"]:
-                    firefox_install = parent / "App" / firefox_dir_name
-                    if firefox_install.exists() and (firefox_install / firefox_binary).exists():
-                        return firefox_install
-
-            current = parent
-
-        return None
+        return get_firefox_installation_dir(profile_path)
 
     def _create_distribution_dir(self, dist_dir: Path) -> None:
         """

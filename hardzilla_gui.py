@@ -29,17 +29,20 @@ from hardzilla.composition_root import CompositionRoot
 from hardzilla.presentation.view_models import (
     SetupViewModel,
     CustomizeViewModel,
-    ApplyViewModel
+    ApplyViewModel,
+    UtilitiesViewModel
 )
 from hardzilla.presentation.views import (
     SetupView,
     CustomizeView,
     ExtensionsView,
-    ApplyView
+    ApplyView,
+    UtilitiesView
 )
 from hardzilla.presentation.controllers import (
     SetupController,
-    ApplyController
+    ApplyController,
+    UtilitiesController
 )
 from hardzilla.presentation.utils import KeyboardHandler
 
@@ -48,11 +51,12 @@ class HardzillaGUI(ctk.CTk):
     """
     Main GUI application for Hardzilla v4.0.
 
-    Implements a 4-tab interface:
+    Implements a 5-tab interface:
     1. Setup & Presets - Choose profile and Firefox path
     2. Customize Settings - Review and modify settings
     3. Extensions - Select and install privacy extensions
     4. Apply to Firefox - Apply configuration to Firefox
+    5. Utilities - Tools like Convert to Portable Firefox
     """
 
     def __init__(self):
@@ -111,12 +115,14 @@ class HardzillaGUI(ctk.CTk):
         self.import_from_firefox = self.composition_root.import_from_firefox
         self.load_preset = self.composition_root.load_preset
         self.install_extensions = self.composition_root.install_extensions
+        self.convert_to_portable = self.composition_root.convert_to_portable
 
     def _init_view_models(self):
         """Initialize view models"""
         self.setup_vm = SetupViewModel()
         self.customize_vm = CustomizeViewModel(settings_repo=self.settings_repo)
         self.apply_vm = ApplyViewModel()
+        self.utilities_vm = UtilitiesViewModel()
 
     def _init_controllers(self):
         """Initialize controllers"""
@@ -134,6 +140,13 @@ class HardzillaGUI(ctk.CTk):
             apply_settings=self.apply_settings,
             save_profile=self.save_profile,
             install_extensions=self.install_extensions,
+            ui_callback=self._schedule_ui_update
+        )
+
+        self.utilities_controller = UtilitiesController(
+            view_model=self.utilities_vm,
+            convert_to_portable=self.convert_to_portable,
+            portable_repo=self.composition_root.portable_repo,
             ui_callback=self._schedule_ui_update
         )
 
@@ -156,6 +169,7 @@ class HardzillaGUI(ctk.CTk):
         self.tabview.add("Customize Settings")
         self.tabview.add("Extensions")
         self.tabview.add("Apply to Firefox")
+        self.tabview.add("Utilities")
 
         # Create content in each tab
         self._create_tab_content()
@@ -203,7 +217,7 @@ class HardzillaGUI(ctk.CTk):
 
     def _create_tab_content(self):
         """Create content for each tab"""
-        logger.debug("_create_tab_content: creating views for all 4 tabs")
+        logger.debug("_create_tab_content: creating views for all 5 tabs")
         # Tab 1: Setup & Presets
         self.setup_view = SetupView(
             parent=self.tabview.tab("Setup & Presets"),
@@ -246,6 +260,17 @@ class HardzillaGUI(ctk.CTk):
         )
         self.apply_view.pack(fill="both", expand=True)
 
+        # Tab 5: Utilities
+        self.utilities_view = UtilitiesView(
+            parent=self.tabview.tab("Utilities"),
+            view_model=self.utilities_vm,
+            on_convert=self._on_convert_to_portable,
+            on_cancel_convert=self._on_cancel_portable_conversion,
+            on_estimate_requested=self._on_estimate_portable_size,
+            on_back=self._on_utilities_back
+        )
+        self.utilities_view.pack(fill="both", expand=True)
+
     def _init_keyboard_shortcuts(self):
         """Initialize keyboard shortcuts"""
         self.keyboard_handler = KeyboardHandler(self)
@@ -277,6 +302,8 @@ class HardzillaGUI(ctk.CTk):
         logger.debug("_on_tab_changed: switched to '%s'", current)
         if current in ("Extensions", "Apply to Firefox"):
             self._sync_apply_vm()
+        elif current == "Utilities":
+            self._sync_utilities_vm()
 
     def _sync_apply_vm(self):
         """Ensure apply_vm has the latest profile and firefox_path from other ViewModels."""
@@ -371,6 +398,9 @@ class HardzillaGUI(ctk.CTk):
         # Sync firefox_path to apply_vm immediately so Extensions tab can use it
         # regardless of navigation flow (direct tab click vs Next button)
         self.apply_vm.firefox_path = path
+        # Sync to utilities_vm and re-detect Firefox installation
+        self.utilities_vm.profile_path = path
+        self.utilities_vm.firefox_install_dir = ''  # Reset to trigger re-detection
         logger.debug("_on_firefox_path_changed: apply_vm.firefox_path synced")
         try:
             self.setup_controller.handle_firefox_path_changed(path)
@@ -503,6 +533,42 @@ class HardzillaGUI(ctk.CTk):
         """Handle back from apply tab"""
         logger.debug("_on_apply_back: navigating Apply to Firefox -> Extensions")
         self.tabview.set("Extensions")
+
+    def _on_utilities_back(self):
+        """Handle back from utilities tab"""
+        logger.debug("_on_utilities_back: navigating Utilities -> Apply to Firefox")
+        self.tabview.set("Apply to Firefox")
+
+    def _sync_utilities_vm(self):
+        """Sync utilities ViewModel with current state from other ViewModels."""
+        # Sync profile path from setup
+        if self.setup_vm.firefox_path:
+            self.utilities_vm.profile_path = self.setup_vm.firefox_path
+
+        # Detect Firefox installation if not already detected
+        if not self.utilities_vm.firefox_install_dir:
+            self.utilities_controller.detect_firefox_installation(
+                self.setup_vm.firefox_path
+            )
+
+    def _on_convert_to_portable(self):
+        """Handle Convert to Portable button click."""
+        logger.debug("_on_convert_to_portable: starting conversion")
+        try:
+            self.utilities_controller.handle_convert()
+        except Exception as e:
+            logger.error(f"Failed to start conversion: {e}", exc_info=True)
+            self._show_error("Conversion Failed", str(e))
+
+    def _on_cancel_portable_conversion(self):
+        """Handle Cancel button during portable conversion."""
+        logger.debug("_on_cancel_portable_conversion: cancelling")
+        self.utilities_controller.cancel_conversion()
+
+    def _on_estimate_portable_size(self):
+        """Handle size estimation request (destination change or profile toggle)."""
+        logger.debug("_on_estimate_portable_size: updating size estimate")
+        self.utilities_controller.estimate_size()
 
     def _show_error(self, title: str, message: str):
         """Show error dialog"""

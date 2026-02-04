@@ -5,5 +5,6 @@ from .setup_view import SetupView
 from .customize_view import CustomizeView
 from .extensions_view import ExtensionsView
 from .apply_view import ApplyView
+from .utilities_view import UtilitiesView
 
-__all__ = ['SetupView', 'CustomizeView', 'ExtensionsView', 'ApplyView']
+__all__ = ['SetupView', 'CustomizeView', 'ExtensionsView', 'ApplyView', 'UtilitiesView']
