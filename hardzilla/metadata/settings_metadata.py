@@ -1646,6 +1646,201 @@ SETTINGS_METADATA: Dict[str, Dict[str, Any]] = {
     },
 
     # =========================================================================
+    # PRIVACY - SESSION: Home Page & New Tab Settings
+    # =========================================================================
+
+    'newtab_topsites': {
+        'name': 'Show Frequently Visited Sites',
+        'category': 'privacy',
+        'subcategory': 'session',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Display your most visited sites on the new tab page.',
+        'full': (
+            'When enabled, Firefox shows a grid of your most frequently visited websites on the '
+            'new tab page and home page. While convenient for quick access, this reveals your '
+            'browsing habits to anyone who can see your screen. For privacy, disable this to '
+            'prevent your browsing patterns from being displayed. Top sites are stored locally '
+            'and not sent to Mozilla.'
+        ),
+        'pref': 'browser.newtabpage.activity-stream.feeds.topsites',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show', 'Hide'],
+        'default': True,
+        'recommended': {
+            'balanced': True,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'newtab_highlights': {
+        'name': 'Show Recent Activity',
+        'category': 'privacy',
+        'subcategory': 'session',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Display recent downloads, bookmarks, and visited pages.',
+        'full': (
+            'When enabled, Firefox shows "Highlights" on the new tab page - a section featuring '
+            'your recent downloads, newly bookmarked pages, and recently visited sites. This '
+            'provides quick access to recent activity but exposes your browsing history on screen. '
+            'Disable for privacy to prevent recent activity from being displayed on the new tab page.'
+        ),
+        'pref': 'browser.newtabpage.activity-stream.feeds.section.highlights',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show', 'Hide'],
+        'default': True,
+        'recommended': {
+            'balanced': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'newtab_pocket': {
+        'name': 'Show Pocket Recommendations',
+        'category': 'privacy',
+        'subcategory': 'session',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Display recommended articles from Pocket on the new tab page.',
+        'full': (
+            'When enabled, Firefox shows "Recommended by Pocket" stories on your new tab page. '
+            'These are curated articles selected by Pocket (owned by Mozilla). While the selection '
+            'is not personalized based on your browsing, displaying third-party content recommendations '
+            'may be unwanted. Disable to remove Pocket stories from your new tab page entirely.'
+        ),
+        'pref': 'browser.newtabpage.activity-stream.feeds.section.topstories',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show', 'Hide'],
+        'default': True,
+        'recommended': {
+            'balanced': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'newtab_sponsored': {
+        'name': 'Show Sponsored Shortcuts',
+        'category': 'privacy',
+        'subcategory': 'session',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Display sponsored/advertising shortcuts on the new tab page.',
+        'full': (
+            'When enabled, Firefox may show sponsored shortcuts (paid placements) in your top '
+            'sites section. These are advertisements that Mozilla receives payment for displaying. '
+            'While they help fund Firefox development, they represent advertising content. '
+            'Disable to remove all sponsored shortcuts from your new tab page.'
+        ),
+        'pref': 'browser.newtabpage.activity-stream.showSponsoredTopSites',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show', 'Hide'],
+        'default': True,
+        'recommended': {
+            'balanced': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'newtab_sponsored_stories': {
+        'name': 'Show Sponsored Stories',
+        'category': 'privacy',
+        'subcategory': 'session',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Display sponsored articles in Pocket recommendations.',
+        'full': (
+            'When enabled, sponsored (paid) articles may appear among the Pocket recommendations '
+            'on your new tab page. These are advertisements disguised as article recommendations. '
+            'Disable to ensure only organic Pocket recommendations are shown, or disable Pocket '
+            'entirely with the "Show Pocket Recommendations" setting.'
+        ),
+        'pref': 'browser.newtabpage.activity-stream.showSponsored',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show', 'Hide'],
+        'default': True,
+        'recommended': {
+            'balanced': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'newtab_search': {
+        'name': 'Show Search on New Tab',
+        'category': 'privacy',
+        'subcategory': 'session',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Display a search bar on the new tab page.',
+        'full': (
+            'When enabled, Firefox displays a prominent search bar on the new tab page. This '
+            'provides quick access to search but is redundant with the address bar which also '
+            'supports search. Some users prefer a minimal new tab page without the search bar. '
+            'Disable to remove the search bar from the new tab page (you can still search via '
+            'the address bar).'
+        ),
+        'pref': 'browser.newtabpage.activity-stream.showSearch',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show', 'Hide'],
+        'default': True,
+        'recommended': {
+            'balanced': True,
+            'paranoid': True,
+            'open': True
+        }
+    },
+
+    'newtab_weather': {
+        'name': 'Show Weather Widget',
+        'category': 'privacy',
+        'subcategory': 'session',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Display weather information on the new tab page.',
+        'full': (
+            'When enabled, Firefox shows current weather information on the new tab page. This '
+            'requires Firefox to know your approximate location to fetch relevant weather data. '
+            'While convenient, this involves location-based data requests. Disable to remove the '
+            'weather widget and prevent location-based weather lookups.'
+        ),
+        'pref': 'browser.newtabpage.activity-stream.showWeather',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show', 'Hide'],
+        'default': True,
+        'recommended': {
+            'balanced': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    # =========================================================================
     # PRIVACY - DATA (subcategory: 'data')
     # =========================================================================
 
@@ -2106,23 +2301,51 @@ SETTINGS_METADATA: Dict[str, Dict[str, Any]] = {
         }
     },
 
-    'webcompat_fixes': {
+    'fix_major_site_issues': {
+        'name': 'Fix Major Site Issues',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Allow exceptions to tracking protection for essential domains that would cause major site breakage.',
+        'full': (
+            'Helps load sites and features by unblocking only essential elements that may '
+            'contain trackers. Covers most common problems like sites that fail to load or '
+            'major functionality that is broken. This is the baseline tier of web compatibility '
+            'exceptions in Firefox Enhanced Tracking Protection Strict mode. Disable for '
+            'maximum tracking protection at the cost of significant site breakage.'
+        ),
+        'pref': 'privacy.trackingprotection.allow_list.baseline.enabled',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'high',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'fix_minor_site_issues': {
         'name': 'Fix Minor Site Issues',
         'category': 'privacy',
         'subcategory': 'tracking',
         'level': 'base',
         'mechanism': 'prefs',
-        'short': 'Reduce minor site issues by unblocking components that may include trackers.',
+        'short': 'Restore elements like videos or comment sections by allowing exceptions for domains that may include trackers.',
         'full': (
-            'Enables web compatibility fixes that can restore elements like embedded videos in '
-            'articles or comment sections by unblocking components that might include tracking '
-            'elements. This reduces site breakage but provides less tracking protection. It is '
-            'designed to work alongside Enhanced Tracking Protection in Strict mode. When '
-            'enabled, Firefox uses SmartBlock and other heuristics to selectively unblock '
-            'third-party resources that are likely to cause site breakage while still blocking '
-            'most trackers. Disable for maximum tracking protection at the cost of more site issues.'
+            'Restores things like videos in an article or comment sections by allowing '
+            'exceptions for domains that may contain trackers. This can reduce site issues but '
+            'offers less protection. Only effective when used together with Fix Major Site '
+            'Issues. This is the convenience tier of web compatibility exceptions in Firefox '
+            'Enhanced Tracking Protection Strict mode.'
         ),
-        'pref': 'privacy.antitracking.enableWebcompat',
+        'pref': 'privacy.trackingprotection.allow_list.convenience.enabled',
         'type': 'toggle',
         'impact': 'medium',
         'compatibility': 'moderate',
@@ -2130,7 +2353,9 @@ SETTINGS_METADATA: Dict[str, Dict[str, Any]] = {
         'labels': ['Enabled', 'Disabled'],
         'default': True,
         'recommended': {
+            'max_power': True,
             'balanced': True,
+            'battery': True,
             'paranoid': False,
             'open': True
         }
@@ -3067,6 +3292,1363 @@ SETTINGS_METADATA: Dict[str, Dict[str, Any]] = {
             'balanced': True,
             'paranoid': False,
             'open': True
+        }
+    },
+
+    # =========================================================================
+    # PRIVACY - TRACKING: Enhanced Tracking & Fingerprinting
+    # =========================================================================
+
+    'tracking_protection_enabled': {
+        'name': 'Enhanced Tracking Protection',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Enable Enhanced Tracking Protection to block known trackers.',
+        'full': (
+            'Master switch for Firefox Enhanced Tracking Protection. When enabled, Firefox '
+            'blocks known trackers from tracking your activity across websites. This works with '
+            'the Tracking Protection Level setting to determine which trackers to block. '
+            'Disabling this removes all ETP protections. Keep enabled for basic privacy protection.'
+        ),
+        'pref': 'privacy.trackingprotection.enabled',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': True,
+            'open': True
+        }
+    },
+
+    'resist_fingerprinting': {
+        'name': 'Resist Fingerprinting (RFP)',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Spoof browser properties to resist fingerprinting.',
+        'full': (
+            'Resist Fingerprinting (RFP) makes Firefox actively lie about many browser properties '
+            'to prevent fingerprinting. It spoofs timezone to UTC, rounds window dimensions, '
+            'reports a generic user agent, disables font enumeration, and normalizes many APIs. '
+            'This is the most powerful anti-fingerprinting measure but causes significant site '
+            'breakage: timezone-dependent sites break, video may be limited to 30fps, and some '
+            'sites may look different. Inspired by Tor Browser settings.'
+        ),
+        'pref': 'privacy.resistFingerprinting',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'major',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'first_party_isolate': {
+        'name': 'First-Party Isolation (FPI)',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Isolate all browser data per first-party domain.',
+        'full': (
+            'First-Party Isolation (FPI) restricts cookies, cache, and other browser state to '
+            'the first-party domain. This prevents trackers embedded on multiple sites from '
+            'correlating your activity. For example, a Facebook Like button on different sites '
+            'cannot share cookies to track you. This is very effective against cross-site '
+            'tracking but breaks some SSO logins, embedded content, and payment flows. '
+            'WARNING: Firefox 86+ uses Dynamic FPI (dFPI) via Enhanced Tracking Protection. '
+            'Enabling legacy FPI alongside dFPI can cause double-isolation issues. Prefer using '
+            'Tracking Protection Level "Strict" mode instead, which enables dFPI automatically.'
+        ),
+        'pref': 'privacy.firstparty.isolate',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'major',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'social_tracking_block': {
+        'name': 'Block Social Trackers',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Block tracking by social media platforms.',
+        'full': (
+            'Blocks social media trackers (Facebook, Twitter, LinkedIn, etc.) that are embedded '
+            'on third-party websites. Social media companies use these trackers (like/share '
+            'buttons, pixels, SDKs) to track your browsing activity across the web. Blocking '
+            'these prevents social media from building a profile of your browsing. Some embedded '
+            'social features (comments, sharing) may break.'
+        ),
+        'pref': 'privacy.trackingprotection.socialtracking.enabled',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Block', 'Allow'],
+        'default': True,
+        'recommended': {
+            'max_power': False,
+            'balanced': True,
+            'battery': True,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'do_not_track': {
+        'name': 'Do Not Track Header',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Send a Do Not Track request to websites.',
+        'full': (
+            'Sends a DNT (Do Not Track) header with every request, asking websites not to track '
+            'you. Most websites ignore this header, and it can actually make you more fingerprintable '
+            'since few users enable it. Some privacy advocates recommend disabling it because '
+            'it provides no real protection while adding to your fingerprint. The Global Privacy '
+            'Control (GPC) header is a more effective alternative.'
+        ),
+        'pref': 'privacy.donottrackheader.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Send', 'Do Not Send'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    # =========================================================================
+    # PRIVACY - TRACKING: Additional Telemetry Controls
+    # =========================================================================
+
+    'telemetry_unified': {
+        'name': 'Unified Telemetry',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Master switch for the unified telemetry system.',
+        'full': (
+            'Controls the unified telemetry framework that collects and sends all types of '
+            'telemetry data. When disabled, it prevents the collection of most telemetry data '
+            'at the source. This is more thorough than disabling individual telemetry toggles. '
+            'Disable for maximum privacy from Mozilla data collection.'
+        ),
+        'pref': 'toolkit.telemetry.unified',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'telemetry_archive': {
+        'name': 'Telemetry Archive',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Store telemetry data locally before sending.',
+        'full': (
+            'When enabled, Firefox stores telemetry pings locally in an archive before sending '
+            'them to Mozilla. Disabling prevents telemetry data from being stored on disk. '
+            'This reduces disk usage and prevents telemetry data from persisting on your system.'
+        ),
+        'pref': 'toolkit.telemetry.archive.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'telemetry_new_profile_ping': {
+        'name': 'New Profile Ping',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Send ping when a new profile is created.',
+        'full': (
+            'Firefox sends a telemetry ping to Mozilla when a new browser profile is created. '
+            'This helps Mozilla track new installations and profile creation patterns. Disable '
+            'to prevent Mozilla from being notified when you create new profiles.'
+        ),
+        'pref': 'toolkit.telemetry.newProfilePing.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'telemetry_shutdown_ping': {
+        'name': 'Shutdown Ping Sender',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Send telemetry data when Firefox shuts down.',
+        'full': (
+            'When enabled, Firefox sends pending telemetry pings during shutdown. This ensures '
+            'telemetry data collected during the session reaches Mozilla even if Firefox would '
+            'not be opened again soon. Disable to prevent telemetry from being sent at shutdown.'
+        ),
+        'pref': 'toolkit.telemetry.shutdownPingSender.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'telemetry_update_ping': {
+        'name': 'Update Ping',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Send telemetry when Firefox updates.',
+        'full': (
+            'Firefox sends a telemetry ping to Mozilla when the browser is updated. This helps '
+            'Mozilla track update adoption rates and identify update issues. Disable to prevent '
+            'update notifications from being sent to Mozilla.'
+        ),
+        'pref': 'toolkit.telemetry.updatePing.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'telemetry_bhr_ping': {
+        'name': 'Background Hang Reporter',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Report browser hangs to Mozilla.',
+        'full': (
+            'The Background Hang Reporter (BHR) detects when Firefox hangs or becomes '
+            'unresponsive and sends reports to Mozilla. This helps identify performance issues. '
+            'Disable if you prefer not to send hang reports. This data helps Mozilla fix '
+            'performance regressions but involves sending diagnostic data.'
+        ),
+        'pref': 'toolkit.telemetry.bhrPing.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'telemetry_first_shutdown_ping': {
+        'name': 'First Shutdown Ping',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Send telemetry on first browser shutdown.',
+        'full': (
+            'Sends a special telemetry ping the first time Firefox is shut down after installation '
+            'or profile creation. This provides Mozilla with initial usage data. Disable to '
+            'prevent this first-run telemetry from being sent.'
+        ),
+        'pref': 'toolkit.telemetry.firstShutdownPing.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'coverage_opt_out': {
+        'name': 'Coverage Opt-Out',
+        'category': 'privacy',
+        'subcategory': 'tracking',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Opt out of Mozilla coverage measurement.',
+        'full': (
+            'Mozilla uses coverage pings to estimate the number of active Firefox users. '
+            'This setting opts out of coverage measurement. When enabled (opted out), Firefox '
+            'does not send coverage pings. This is separate from regular telemetry and is used '
+            'purely for user counting purposes.'
+        ),
+        'pref': 'toolkit.coverage.opt-out',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Opt Out', 'Participate'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': True,
+            'battery': True,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    # =========================================================================
+    # SECURITY - NETWORK: TLS, Certificates & Safe Browsing
+    # =========================================================================
+
+    'mixed_content_block_display': {
+        'name': 'Block Passive Mixed Content',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Block insecure images and media on HTTPS pages.',
+        'full': (
+            'Blocks passive mixed content like images, audio, and video loaded over HTTP on '
+            'HTTPS pages. While less dangerous than active mixed content (scripts), passive '
+            'mixed content can still reveal browsing information and be tampered with. Enabling '
+            'this may break some older sites that serve images over HTTP. Most modern sites '
+            'serve all content over HTTPS.'
+        ),
+        'pref': 'security.mixed_content.block_display_content',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Block', 'Allow'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'tls_min_version': {
+        'name': 'Minimum TLS Version',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Set minimum required TLS protocol version.',
+        'full': (
+            'Sets the minimum TLS version Firefox will accept for HTTPS connections. TLS 1.2 '
+            'is the recommended minimum as older versions have known vulnerabilities. TLS 1.3 '
+            'is the most secure but some older servers only support TLS 1.2. Setting to TLS 1.3 '
+            'only may break connections to older websites and services. TLS 1.0 and 1.1 are '
+            'deprecated and should never be used.'
+        ),
+        'pref': 'security.tls.version.min',
+        'type': 'choice',
+        'impact': 'high',
+        'compatibility': 'minor',
+        'values': [3, 4],  # 3 = TLS 1.2, 4 = TLS 1.3
+        'labels': ['TLS 1.2 (Recommended)', 'TLS 1.3 Only'],
+        'default': 3,
+        'recommended': {
+            'max_power': 3,
+            'balanced': 3,
+            'battery': 3,
+            'paranoid': 3,
+            'open': 3
+        }
+    },
+
+    'ssl_safe_negotiation': {
+        'name': 'Require Safe SSL Negotiation',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Require RFC 5746 safe renegotiation for TLS connections.',
+        'full': (
+            'Requires servers to support RFC 5746 safe renegotiation, which prevents a class '
+            'of man-in-the-middle attacks during TLS renegotiation. Most modern servers support '
+            'this. Enabling may break connections to very old or misconfigured servers. This is '
+            'a low-risk security improvement that protects against a specific attack vector.'
+        ),
+        'pref': 'security.ssl.require_safe_negotiation',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Required', 'Optional'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': True,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'ssl_unsafe_negotiation_warning': {
+        'name': 'Warn on Unsafe SSL Negotiation',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Show warning indicator for connections without safe negotiation.',
+        'full': (
+            'Shows a broken lock icon for HTTPS connections that do not support RFC 5746 safe '
+            'renegotiation. This visually warns you when a connection might be vulnerable to '
+            'renegotiation attacks. Useful for identifying servers with weak TLS configurations.'
+        ),
+        'pref': 'security.ssl.treat_unsafe_negotiation_as_broken',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show Warning', 'Hide Warning'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': True,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'ocsp_enabled': {
+        'name': 'OCSP Certificate Checking',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Check if TLS certificates have been revoked.',
+        'full': (
+            'OCSP (Online Certificate Status Protocol) checks whether a website certificate '
+            'has been revoked by its issuer. This protects against compromised certificates. '
+            '"Disabled" skips checks (fast but less secure). "Enabled" checks when possible '
+            'but allows connection if check fails. Checking adds slight latency to new '
+            'connections but significantly improves security.'
+        ),
+        'pref': 'security.OCSP.enabled',
+        'type': 'choice',
+        'impact': 'medium',
+        'compatibility': 'none',
+        'values': [0, 1],
+        'labels': ['Disabled', 'Enabled'],
+        'default': 1,
+        'recommended': {
+            'max_power': 1,
+            'balanced': 1,
+            'battery': 1,
+            'paranoid': 1,
+            'open': 1
+        }
+    },
+
+    'ocsp_require': {
+        'name': 'Require OCSP Response',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Block connections when OCSP check fails.',
+        'full': (
+            'When enabled (hard-fail), Firefox blocks connections if it cannot verify the '
+            'certificate status via OCSP. This is more secure but may prevent access to sites '
+            'when OCSP servers are temporarily unavailable. When disabled (soft-fail), Firefox '
+            'allows the connection even if OCSP check fails. Hard-fail provides better security '
+            'but may cause intermittent access issues.'
+        ),
+        'pref': 'security.OCSP.require',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Hard-Fail (Strict)', 'Soft-Fail (Lenient)'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'cert_pinning': {
+        'name': 'Certificate Pinning',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Enforce certificate pinning for known sites.',
+        'full': (
+            'Certificate pinning ensures that connections to specific high-value sites (like '
+            'Google, Mozilla, Twitter) only accept certificates from expected Certificate '
+            'Authorities. This prevents attacks using rogue certificates. Level 0 disables '
+            'pinning. Level 1 allows user-added CAs to override pins (for corporate proxies). '
+            'Level 2 enforces strict pinning (may break corporate SSL inspection).'
+        ),
+        'pref': 'security.cert_pinning.enforcement_level',
+        'type': 'choice',
+        'impact': 'medium',
+        'compatibility': 'minor',
+        'values': [0, 1, 2],
+        'labels': ['Disabled', 'Allow Exceptions', 'Strict'],
+        'default': 1,
+        'recommended': {
+            'max_power': 1,
+            'balanced': 1,
+            'battery': 1,
+            'paranoid': 2,
+            'open': 1
+        }
+    },
+
+    'sha1_enforcement': {
+        'name': 'SHA-1 Certificate Enforcement',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Reject certificates signed with weak SHA-1 algorithm.',
+        'full': (
+            'SHA-1 is a cryptographically broken hash algorithm. Certificates signed with SHA-1 '
+            'are vulnerable to collision attacks. Most Certificate Authorities stopped issuing '
+            'SHA-1 certificates in 2016. Level 0 allows all SHA-1 certs. Level 1 blocks SHA-1 '
+            'for public CAs only. Level 2 blocks all SHA-1 certs. Level 4 blocks SHA-1 '
+            'everywhere including local CAs. Use level 1+ for security.'
+        ),
+        'pref': 'security.pki.sha1_enforcement_level',
+        'type': 'choice',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [0, 1, 2, 4],
+        'labels': ['Allow All', 'Block Public CA', 'Block All', 'Block Everywhere'],
+        'default': 1,
+        'recommended': {
+            'max_power': 1,
+            'balanced': 1,
+            'battery': 1,
+            'paranoid': 2,
+            'open': 1
+        }
+    },
+
+    'safe_browsing_malware': {
+        'name': 'Safe Browsing: Malware',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Block known malware sites using Google Safe Browsing.',
+        'full': (
+            'Uses Google Safe Browsing to warn you when you visit sites known to distribute '
+            'malware. Firefox checks URLs against a locally stored list (updated periodically). '
+            'No browsing data is sent to Google for this check. This provides important security '
+            'against malware infections. Disabling removes this protection layer. Keep enabled '
+            'unless you have a specific reason to disable it.'
+        ),
+        'pref': 'browser.safebrowsing.malware.enabled',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': True,
+            'open': True
+        }
+    },
+
+    'safe_browsing_phishing': {
+        'name': 'Safe Browsing: Phishing',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Warn about deceptive phishing sites.',
+        'full': (
+            'Uses Google Safe Browsing to warn you about deceptive sites that try to steal '
+            'credentials or personal information. Firefox checks against a locally stored list. '
+            'This is one of the most effective protections against phishing attacks. Keep enabled '
+            'to be warned when you encounter known phishing sites.'
+        ),
+        'pref': 'browser.safebrowsing.phishing.enabled',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': True,
+            'open': True
+        }
+    },
+
+    'safe_browsing_downloads': {
+        'name': 'Safe Browsing: Downloads',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Scan downloads for known malware.',
+        'full': (
+            'Checks downloaded files against a list of known malware. This provides an extra '
+            'layer of protection against downloading malicious software. The check uses a locally '
+            'stored blocklist. This is separate from the remote download checking feature. '
+            'Keep enabled to be warned about known malicious downloads.'
+        ),
+        'pref': 'browser.safebrowsing.downloads.enabled',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': True,
+            'open': True
+        }
+    },
+
+    'safe_browsing_downloads_remote': {
+        'name': 'Remote Download Scanning',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Send download metadata to Google for advanced malware checking.',
+        'full': (
+            'When enabled, Firefox sends metadata about downloaded files (hash, size, source URL) '
+            'to Google for analysis against a broader database of known malware. This provides '
+            'better protection but sends download information to Google. Privacy-conscious users '
+            'may want to disable this while keeping local download scanning enabled.'
+        ),
+        'pref': 'browser.safebrowsing.downloads.remote.enabled',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    # =========================================================================
+    # SECURITY - NETWORK: Referrer & Link Tracking
+    # =========================================================================
+
+    'referer_cross_origin_policy': {
+        'name': 'Cross-Origin Referrer Policy',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Control what referrer information is sent to other sites.',
+        'full': (
+            'Controls when Firefox sends the Referer header for cross-origin requests. '
+            '0 = Always send full referrer. '
+            '1 = Send referrer only for same base domain (e.g., sub.example.com to example.com). '
+            '2 = Send referrer only for exact same host. '
+            'Restricting cross-origin referrers prevents sites from knowing which page you came '
+            'from, improving privacy. Setting to 1 is a good balance of privacy and compatibility.'
+        ),
+        'pref': 'network.http.referer.XOriginPolicy',
+        'type': 'choice',
+        'impact': 'medium',
+        'compatibility': 'minor',
+        'values': [0, 1, 2],
+        'labels': ['Always Send', 'Same Base Domain Only', 'Same Host Only'],
+        'default': 0,
+        'recommended': {
+            'max_power': 0,
+            'balanced': 1,
+            'battery': 0,
+            'paranoid': 2,
+            'open': 0
+        }
+    },
+
+    'referer_cross_origin_trimming': {
+        'name': 'Cross-Origin Referrer Trimming',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Control how much referrer information is sent cross-origin.',
+        'full': (
+            'Controls how much of the URL is included in the Referer header for cross-origin '
+            'requests. 0 = Send full URL (e.g., https://site.com/page?query). 1 = Send URL '
+            'without query string. 2 = Send only the origin (https://site.com/). Trimming '
+            'reduces information leakage while maintaining basic referrer functionality.'
+        ),
+        'pref': 'network.http.referer.XOriginTrimmingPolicy',
+        'type': 'choice',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [0, 1, 2],
+        'labels': ['Full URL', 'No Query String', 'Origin Only'],
+        'default': 0,
+        'recommended': {
+            'max_power': 0,
+            'balanced': 2,
+            'battery': 0,
+            'paranoid': 2,
+            'open': 0
+        }
+    },
+
+    'send_pings': {
+        'name': 'Hyperlink Auditing Pings',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow tracking pings when clicking links.',
+        'full': (
+            'Hyperlink auditing allows websites to track which links you click by sending a '
+            'ping (HTTP request) to a specified URL when you click a link. This is used for '
+            'click tracking and analytics. Disabling prevents websites from being notified '
+            'when you click their tracked links. This has no impact on normal browsing.'
+        ),
+        'pref': 'browser.send_pings',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Allow', 'Block'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': False
+        }
+    },
+
+    'speculative_connect_urlbar': {
+        'name': 'URL Bar Speculative Connections',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Pre-connect to URLs as you type in the address bar.',
+        'full': (
+            'Firefox opens speculative connections to URLs as you type them in the address bar, '
+            'before you press Enter. This reduces perceived latency but leaks information about '
+            'what you are typing to the destination server before you decide to visit. Disable '
+            'for privacy to prevent premature connections.'
+        ),
+        'pref': 'browser.urlbar.speculativeConnect.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'punycode_display': {
+        'name': 'Show Punycode for IDN Domains',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Show punycode instead of Unicode in domain names to prevent phishing.',
+        'full': (
+            'Internationalized Domain Names (IDN) can contain Unicode characters that look '
+            'identical to ASCII characters (homograph attacks). For example, "аpple.com" using '
+            'Cyrillic "а" looks like "apple.com". Showing punycode (xn--...) instead reveals '
+            'the real domain and prevents these phishing attacks. Enable for security, especially '
+            'if you visit sites in multiple languages.'
+        ),
+        'pref': 'network.IDN_show_punycode',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show Punycode', 'Show Unicode'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': True,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    'socks_remote_dns': {
+        'name': 'SOCKS Proxy Remote DNS',
+        'category': 'security',
+        'subcategory': 'network',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Resolve DNS through SOCKS proxy to prevent DNS leaks.',
+        'full': (
+            'When using a SOCKS proxy (like Tor or a VPN SOCKS proxy), DNS queries can bypass '
+            'the proxy and go directly to your ISP DNS server, revealing which sites you visit. '
+            'Enabling this sends DNS queries through the SOCKS proxy, preventing DNS leaks. '
+            'Essential for privacy when using SOCKS proxies. Has no effect without a SOCKS proxy.'
+        ),
+        'pref': 'network.proxy.socks_remote_dns',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Proxy DNS (Secure)', 'Local DNS (Leaky)'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': True,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    # =========================================================================
+    # FEATURES - DOM & NETWORK: Web APIs
+    # =========================================================================
+
+    'beacon_api': {
+        'name': 'Beacon API',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow sites to send analytics data when you leave a page.',
+        'full': (
+            'The Beacon API allows websites to send small amounts of data to a server when you '
+            'leave a page, without delaying navigation. It is primarily used for analytics and '
+            'tracking (sending page view duration, click data, etc.). Disabling prevents this '
+            'background data sending but may affect some legitimate analytics and session '
+            'management. Most users will not notice any difference with it disabled.'
+        ),
+        'pref': 'beacon.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'device_sensors': {
+        'name': 'Device Sensors API',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow websites to access device motion and orientation sensors.',
+        'full': (
+            'The Device Sensors API provides access to accelerometer, gyroscope, and ambient '
+            'light sensor data. Used by some web games, VR experiences, and fitness apps. '
+            'However, sensor data can be used for fingerprinting and tracking. On desktop '
+            'computers these sensors are rarely useful. Disabling improves privacy with minimal '
+            'impact on regular browsing.'
+        ),
+        'pref': 'device.sensors.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'battery_api': {
+        'name': 'Battery Status API',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow websites to read your battery level.',
+        'full': (
+            'The Battery Status API lets websites read your device battery level, charging '
+            'status, and estimated time remaining. This data can be used for fingerprinting '
+            '(unique battery level combinations identify users) and behavioral tracking '
+            '(adjusting prices based on low battery urgency). No legitimate website needs '
+            'your battery information. Disable for privacy.'
+        ),
+        'pref': 'dom.battery.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': True,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'clipboard_events': {
+        'name': 'Clipboard Events',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow sites to detect copy/cut/paste events.',
+        'full': (
+            'When enabled, websites can detect and intercept clipboard events (copy, cut, paste). '
+            'Some sites use this to add attribution text to copied content, prevent copying, '
+            'or modify pasted content. Disabling prevents websites from interfering with your '
+            'clipboard but may break paste functionality on some web apps (like code editors). '
+            'Consider leaving enabled unless you encounter annoying clipboard modifications.'
+        ),
+        'pref': 'dom.event.clipboardevents.enabled',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'moderate',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'push_notifications_api': {
+        'name': 'Push API',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow websites to receive push messages from servers.',
+        'full': (
+            'The Push API enables websites to receive push notifications from their servers '
+            'even when the site is not open. This is used by web apps for real-time updates '
+            '(email notifications, chat messages, etc.). It requires a persistent connection '
+            'to Mozilla push servers. Disabling prevents all web push notifications but also '
+            'breaks Progressive Web App (PWA) notifications. Consider using the notifications '
+            'permission setting for finer control.'
+        ),
+        'pref': 'dom.push.enabled',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'moderate',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'service_workers': {
+        'name': 'Service Workers',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow websites to run background scripts.',
+        'full': (
+            'Service Workers are scripts that run in the background, enabling offline '
+            'functionality, push notifications, and background sync for web apps. They are '
+            'essential for Progressive Web Apps (PWAs) and many modern web features. However, '
+            'they can also be used for tracking and running code after you leave a site. '
+            'Disabling breaks PWAs, offline-capable sites, and push notifications.'
+        ),
+        'pref': 'dom.serviceWorkers.enabled',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'major',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'web_notifications': {
+        'name': 'Web Notifications API',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow websites to display system notifications.',
+        'full': (
+            'The Web Notifications API allows websites to display native desktop notifications. '
+            'This is the underlying API that powers notification popups from web apps. Disabling '
+            'this completely prevents any website from showing notifications, regardless of '
+            'individual permission settings. This is more aggressive than the notifications '
+            'permission which only controls the default behavior.'
+        ),
+        'pref': 'dom.webnotifications.enabled',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'moderate',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'popup_blocking': {
+        'name': 'Block Popups During Page Load',
+        'category': 'features',
+        'subcategory': 'dom',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Block popup windows that open during page loading.',
+        'full': (
+            'Prevents websites from opening popup windows automatically while a page is loading. '
+            'This blocks many types of unwanted popups, advertisement windows, and redirect '
+            'tricks. Keep enabled to prevent popup spam. Some legitimate sites (like banking '
+            'or payment gateways) may require popups to function, which can be allowed per-site.'
+        ),
+        'pref': 'dom.disable_open_during_load',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'minor',
+        'values': [True, False],
+        'labels': ['Block Popups', 'Allow Popups'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': True,
+            'open': True
+        }
+    },
+
+    # =========================================================================
+    # FEATURES - MEDIA: DRM, WebGL, Navigator
+    # =========================================================================
+
+    'drm_enabled': {
+        'name': 'DRM (Encrypted Media Extensions)',
+        'category': 'features',
+        'subcategory': 'media',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Enable DRM for streaming services like Netflix and Spotify.',
+        'full': (
+            'Encrypted Media Extensions (EME) enables DRM-protected content playback. Required '
+            'for Netflix, Amazon Prime Video, Disney+, Spotify, and other streaming services. '
+            'Firefox uses the Widevine CDM (Content Decryption Module) from Google for DRM. '
+            'Disabling breaks all DRM-protected streaming but removes the closed-source Widevine '
+            'component. Free software advocates may prefer to disable this.'
+        ),
+        'pref': 'media.eme.enabled',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'major',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'media_devices_enumeration': {
+        'name': 'Media Device Enumeration',
+        'category': 'features',
+        'subcategory': 'media',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Allow websites to list your audio/video devices.',
+        'full': (
+            'When enabled, websites can enumerate your media devices (cameras, microphones, '
+            'speakers) using the MediaDevices API. This is needed for video calling sites to '
+            'let you select which camera/microphone to use. However, the list of devices can '
+            'be used for fingerprinting since it is unique to your hardware setup. Disabling '
+            'prevents device enumeration but may break device selection in video call apps.'
+        ),
+        'pref': 'media.navigator.enabled',
+        'type': 'toggle',
+        'impact': 'medium',
+        'compatibility': 'moderate',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': True,
+        'recommended': {
+            'max_power': True,
+            'balanced': True,
+            'battery': True,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'webgl_disabled': {
+        'name': 'Disable WebGL',
+        'category': 'features',
+        'subcategory': 'media',
+        'level': 'advanced',
+        'mechanism': 'userjs',
+        'short': 'Completely disable WebGL rendering.',
+        'full': (
+            'Disabling WebGL completely prevents all WebGL content from rendering. WebGL '
+            'can be used for GPU fingerprinting by rendering specific graphics and measuring '
+            'the output. This is one of the most effective fingerprinting techniques. Disabling '
+            'WebGL breaks 3D content, games, Google Maps 3D view, and some data visualizations. '
+            'This is separate from "Force WebGL" which forces it on unsupported hardware.'
+        ),
+        'pref': 'webgl.disabled',
+        'type': 'toggle',
+        'impact': 'high',
+        'compatibility': 'major',
+        'values': [True, False],
+        'labels': ['WebGL Off', 'WebGL On'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': True,
+            'open': False
+        }
+    },
+
+    # =========================================================================
+    # SECURITY - PERMISSIONS: Browser Behavior
+    # =========================================================================
+
+    'urlbar_search_suggestions': {
+        'name': 'URL Bar Search Suggestions',
+        'category': 'security',
+        'subcategory': 'permissions',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Show search suggestions in the address bar dropdown.',
+        'full': (
+            'When enabled, the address bar shows search suggestions from your search engine '
+            'as you type. This sends your partial queries to the search engine in real-time. '
+            'This is separate from the main search suggestions toggle and specifically controls '
+            'the address bar integration. Disable to prevent sending keystrokes to search engines '
+            'when typing in the address bar.'
+        ),
+        'pref': 'browser.urlbar.suggest.searches',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Enabled', 'Disabled'],
+        'default': False,
+        'recommended': {
+            'max_power': True,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': True
+        }
+    },
+
+    'aboutconfig_warning': {
+        'name': 'about:config Warning Page',
+        'category': 'security',
+        'subcategory': 'permissions',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Show warning when opening about:config.',
+        'full': (
+            'Controls whether Firefox shows a warning page when you open about:config. '
+            'The warning page exists to prevent accidental changes to advanced settings. '
+            'Experienced users may want to disable this for faster access to about:config. '
+            'Disable if you frequently access about:config and understand the risks.'
+        ),
+        'pref': 'browser.aboutConfig.showWarning',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Show Warning', 'Skip Warning'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': False
+        }
+    },
+
+    'check_default_browser': {
+        'name': 'Check Default Browser',
+        'category': 'security',
+        'subcategory': 'permissions',
+        'level': 'base',
+        'mechanism': 'prefs',
+        'short': 'Check if Firefox is the default browser on startup.',
+        'full': (
+            'When enabled, Firefox checks if it is the default browser each time it starts '
+            'and prompts you to set it as default if it is not. This can be annoying for users '
+            'who intentionally use another browser as default. Disable to stop the default '
+            'browser check and prompts.'
+        ),
+        'pref': 'browser.shell.checkDefaultBrowser',
+        'type': 'toggle',
+        'impact': 'low',
+        'compatibility': 'none',
+        'values': [True, False],
+        'labels': ['Check', 'Do Not Check'],
+        'default': False,
+        'recommended': {
+            'max_power': False,
+            'balanced': False,
+            'battery': False,
+            'paranoid': False,
+            'open': False
         }
     }
 }

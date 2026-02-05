@@ -14,7 +14,12 @@ EXTENSIONS_METADATA = {
         "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
         "icon": "🛡️",
         "breakage_risk": 2,
-        "size_mb": 3.2
+        "size_mb": 3.2,
+        # Custom filter lists that replace uBlock Origin's default lists
+        # These are loaded via Firefox Enterprise Policies (3rdparty.Extensions)
+        "custom_filter_lists": [
+            "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.mini.txt"
+        ]
     },
     "jid1-MnnxcxisBPnSXQ@jetpack": {
         "name": "Privacy Badger",
