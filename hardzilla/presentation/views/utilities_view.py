@@ -121,7 +121,7 @@ class UtilitiesView(ctk.CTkFrame):
 
     def _build_convert_card(self, parent, row):
         """Build the Convert to Portable Firefox card."""
-        card = ctk.CTkFrame(parent, corner_radius=12)
+        card = ctk.CTkFrame(parent, corner_radius=8)
         card.grid(row=row, column=0, sticky="ew", padx=10, pady=10)
         card.grid_columnconfigure(1, weight=1)
 
@@ -243,7 +243,7 @@ class UtilitiesView(ctk.CTkFrame):
             text="Cancel",
             command=self._on_cancel_clicked,
             fg_color=Theme.get_color('error'),
-            hover_color="#DC2626",
+            hover_color="#CC3333",
             font=ctk.CTkFont(size=14),
             height=40,
             width=100
@@ -287,7 +287,7 @@ class UtilitiesView(ctk.CTkFrame):
 
     def _build_update_card(self, parent, row):
         """Build the Update Portable Firefox card."""
-        card = ctk.CTkFrame(parent, corner_radius=12)
+        card = ctk.CTkFrame(parent, corner_radius=8)
         card.grid(row=row, column=0, sticky="ew", padx=10, pady=10)
         card.grid_columnconfigure(1, weight=1)
 
@@ -384,7 +384,7 @@ class UtilitiesView(ctk.CTkFrame):
             text="Cancel",
             command=self._on_cancel_update_clicked,
             fg_color=Theme.get_color('error'),
-            hover_color="#DC2626",
+            hover_color="#CC3333",
             font=ctk.CTkFont(size=14),
             height=40,
             width=100

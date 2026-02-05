@@ -5,20 +5,21 @@ Enhanced with visual polish and category organization
 """
 
 import customtkinter as ctk
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 from hardzilla.presentation.view_models import CustomizeViewModel
 from hardzilla.presentation.widgets.setting_row import SettingRow
 from hardzilla.presentation.utils import bind_search_focus, bind_escape_clear
 from hardzilla.domain.entities import Setting
+from hardzilla.presentation.reconciliation import VNode, Reconciler
 
 
 class CustomizeView(ctk.CTkFrame):
     """
-    Screen 2: Customize Settings View with Visual Polish.
+    Screen 2: Customize Settings View.
 
     Features:
-    - Color-coded setting badges ([B] green, [A] purple)
+    - BASE/ADV text labels for setting level
     - Category-organized collapsible sections
     - Search filter across all settings
     - Hover tooltips with descriptions
@@ -30,7 +31,8 @@ class CustomizeView(ctk.CTkFrame):
         parent,
         view_model: CustomizeViewModel,
         on_next: Callable,
-        on_back: Callable
+        on_back: Callable,
+        debug_reconciliation: bool = False
     ):
         """
         Initialize Customize View.
@@ -40,18 +42,20 @@ class CustomizeView(ctk.CTkFrame):
             view_model: CustomizeViewModel for state management
             on_next: Callback for Next button
             on_back: Callback for Back button
+            debug_reconciliation: Enable debug logging of reconciliation metrics
         """
         super().__init__(parent)
         self.view_model = view_model
         self.on_next = on_next
         self.on_back = on_back
+        self.debug_reconciliation = debug_reconciliation
 
         # State
-        self.setting_rows: List[SettingRow] = []
+        self._reconciler: Optional[Reconciler] = None
         # Expand core categories by default
         self.expanded_categories: set = {'privacy', 'security', 'tracking', 'cookies'}
         self.show_advanced = False
-        self.show_descriptions = True  # Show full descriptions by default
+        self.show_descriptions = False  # Compact by default, toggle via checkbox
 
         # Configure grid
         self.grid_columnconfigure(0, weight=1)
@@ -83,49 +87,18 @@ class CustomizeView(ctk.CTkFrame):
         )
         header.grid(row=0, column=0, sticky="w")
 
-        # Legend
-        legend_frame = ctk.CTkFrame(header_frame, fg_color="transparent")
-        legend_frame.grid(row=0, column=1, sticky="e")
-
-        ctk.CTkLabel(
-            legend_frame,
-            text="B",
-            width=25,
-            height=25,
-            font=ctk.CTkFont(size=10, weight="bold"),
-            fg_color="#2FA572",
-            text_color="#FFFFFF",
-            corner_radius=5
-        ).pack(side="left", padx=2)
-
-        ctk.CTkLabel(
-            legend_frame,
-            text="BASE (editable)",
+        # Legend - simple text (Win11 style)
+        legend_label = ctk.CTkLabel(
+            header_frame,
+            text="BASE = editable  |  ADV = locked",
             font=ctk.CTkFont(size=10),
-            text_color="gray"
-        ).pack(side="left", padx=(2, 10))
-
-        ctk.CTkLabel(
-            legend_frame,
-            text="A",
-            width=25,
-            height=25,
-            font=ctk.CTkFont(size=10, weight="bold"),
-            fg_color="#7B68EE",
-            text_color="#FFFFFF",
-            corner_radius=5
-        ).pack(side="left", padx=2)
-
-        ctk.CTkLabel(
-            legend_frame,
-            text="ADVANCED (locked)",
-            font=ctk.CTkFont(size=10),
-            text_color="gray"
-        ).pack(side="left", padx=2)
+            text_color="#9E9E9E"
+        )
+        legend_label.grid(row=0, column=1, sticky="e")
 
     def _build_profile_summary(self):
         """Build profile summary section"""
-        section = ctk.CTkFrame(self, fg_color="#1E1E1E", corner_radius=10)
+        section = ctk.CTkFrame(self, fg_color="#2D2D2D", corner_radius=8)
         section.grid(row=1, column=0, pady=5, sticky="ew", padx=10)
 
         self.profile_name_label = ctk.CTkLabel(
@@ -139,7 +112,7 @@ class CustomizeView(ctk.CTkFrame):
             section,
             text="0 BASE | 0 ADVANCED | 0 total settings",
             font=ctk.CTkFont(size=11),
-            text_color="gray"
+            text_color="#9E9E9E"
         )
         self.stats_label.pack(padx=15, pady=(0, 10))
 
@@ -163,7 +136,7 @@ class CustomizeView(ctk.CTkFrame):
         bind_escape_clear(self.search_entry)
 
         # Show descriptions checkbox
-        self.show_descriptions_var = ctk.BooleanVar(value=True)
+        self.show_descriptions_var = ctk.BooleanVar(value=False)
         self.show_descriptions_check = ctk.CTkCheckBox(
             filter_frame,
             text="Show descriptions",
@@ -188,8 +161,8 @@ class CustomizeView(ctk.CTkFrame):
             text="Reset to Recommended",
             width=150,
             command=self._on_reset_clicked,
-            fg_color="gray",
-            hover_color="#555555"
+            fg_color="#2D2D2D",
+            hover_color="#383838"
         )
         reset_btn.grid(row=0, column=3, padx=5)
 
@@ -209,7 +182,7 @@ class CustomizeView(ctk.CTkFrame):
             self.scrollable_frame,
             text="Generate a profile in Step 1 to see settings here",
             font=ctk.CTkFont(size=12),
-            text_color="gray"
+            text_color="#9E9E9E"
         )
         self.placeholder_label.grid(row=0, column=0, pady=50)
 
@@ -230,7 +203,7 @@ class CustomizeView(ctk.CTkFrame):
             nav_frame,
             text="Next: Apply Settings →",
             command=self.on_next,
-            fg_color="#2FA572"
+            fg_color="#0078D4"
         )
         next_btn.grid(row=0, column=2, padx=10, pady=10)
 
@@ -261,52 +234,75 @@ class CustomizeView(ctk.CTkFrame):
         self._render_settings()
 
     def _render_settings(self):
-        """Render settings list organized by category"""
+        """Render settings list using virtual DOM reconciliation"""
         # Get settings from ViewModel (not profile) to reflect user modifications
         settings = self.view_model.settings
         if not settings:
             return
 
-        # Clear existing widgets
-        self.placeholder_label.grid_forget()
-        for row in self.setting_rows:
-            row.destroy()
-        self.setting_rows.clear()
+        # Build virtual tree representing desired UI state
+        virtual_tree = self._build_virtual_tree(settings)
 
-        # Group settings by category
+        # Initialize reconciler (lazy)
+        if not self._reconciler:
+            self._reconciler = Reconciler(self.scrollable_frame, debug=self.debug_reconciliation)
+            self._reconciler.set_category_toggle_callback(self._toggle_category)
+
+        # Reconcile (minimal updates only)
+        metrics = self._reconciler.reconcile(virtual_tree, self._on_setting_changed)
+
+        # Show placeholder if empty
+        if len(virtual_tree) == 0:
+            self.placeholder_label.configure(text="No settings match your search")
+            self.placeholder_label.grid(row=0, column=0, pady=50)
+        else:
+            self.placeholder_label.grid_forget()
+
+    def _build_virtual_tree(self, settings: Dict[str, Setting]) -> List[VNode]:
+        """
+        Build virtual tree representing desired UI state.
+
+        Creates VNode instances for each category header and setting row
+        based on current filters and expansion state.
+
+        Args:
+            settings: All available settings
+
+        Returns:
+            List of VNodes in display order
+        """
+        virtual_tree = []
+
+        # Group and filter (existing logic)
         categories = self._group_by_category(settings)
-
-        # Filter by search and visibility
         search_text = self.search_entry.get().lower()
         filtered_categories = self._filter_categories(categories, search_text)
 
-        # Render each category
-        row_index = 0
-        for category, settings in filtered_categories.items():
-            # Category header
-            header = self._create_category_header(category, len(settings))
-            header.grid(row=row_index, column=0, pady=(10, 5), sticky="ew")
-            row_index += 1
+        for category, category_settings in filtered_categories.items():
+            # Add category header node
+            virtual_tree.append(VNode(
+                node_type='category_header',
+                key=f'header_{category}',
+                props={
+                    'category': category,
+                    'count': len(category_settings),
+                    'is_expanded': category in self.expanded_categories
+                }
+            ))
 
-            # Settings (collapsible)
+            # Add setting row nodes (if expanded)
             if category in self.expanded_categories:
-                for setting in settings:
-                    row = SettingRow(
-                        self.scrollable_frame,
-                        setting,
-                        on_change=self._on_setting_changed,
-                        show_description=self.show_descriptions
-                    )
-                    row.grid(row=row_index, column=0, pady=2, sticky="ew")
-                    self.setting_rows.append(row)
-                    row_index += 1
+                for setting in category_settings:
+                    virtual_tree.append(VNode(
+                        node_type='setting_row',
+                        key=setting.key,
+                        props={
+                            'setting': setting,
+                            'show_description': self.show_descriptions
+                        }
+                    ))
 
-        # Show message if no results
-        if row_index == 0:
-            self.placeholder_label.configure(
-                text="No settings match your search"
-            )
-            self.placeholder_label.grid(row=0, column=0, pady=50)
+        return virtual_tree
 
     def _group_by_category(self, settings: Dict[str, Setting]) -> Dict[str, List[Setting]]:
         """Group settings by category"""
@@ -354,28 +350,6 @@ class CustomizeView(ctk.CTkFrame):
                 filtered[category] = matching_settings
 
         return filtered
-
-    def _create_category_header(self, category: str, count: int) -> ctk.CTkFrame:
-        """Create collapsible category header"""
-        frame = ctk.CTkFrame(self.scrollable_frame, fg_color="#2B2B2B", corner_radius=5)
-        frame.grid_columnconfigure(1, weight=1)
-
-        # Expand/collapse button
-        is_expanded = category in self.expanded_categories
-        arrow = "▼" if is_expanded else "▶"
-
-        btn = ctk.CTkButton(
-            frame,
-            text=f"{arrow}  {category.upper()}  ({count})",
-            font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="transparent",
-            hover_color="#3B3B3B",
-            anchor="w",
-            command=lambda: self._toggle_category(category)
-        )
-        btn.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
-
-        return frame
 
     def _toggle_category(self, category: str):
         """Toggle category expansion"""

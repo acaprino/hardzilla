@@ -10,64 +10,64 @@ from typing import Dict
 class Theme:
     """Enhanced visual theme for Hardzilla GUI"""
 
-    # Color Palette - Modern, Professional
+    # Color Palette - Windows 11 Dark Theme
     COLORS = {
-        # Primary Colors
-        'primary': '#2563EB',        # Blue
-        'primary_hover': '#1D4ED8',
-        'primary_light': '#DBEAFE',
+        # Primary Colors (Windows Blue)
+        'primary': '#0078D4',
+        'primary_hover': '#106EBE',
+        'primary_light': '#0078D4',
 
-        # Secondary Colors
-        'secondary': '#10B981',      # Green
-        'secondary_hover': '#059669',
-        'secondary_light': '#D1FAE5',
+        # Secondary Colors (Windows Green)
+        'secondary': '#0F7B0F',
+        'secondary_hover': '#0A5D0A',
+        'secondary_light': '#0F7B0F',
 
         # Accent Colors
-        'accent': '#8B5CF6',         # Purple
-        'accent_hover': '#7C3AED',
-        'accent_light': '#EDE9FE',
+        'accent': '#0078D4',
+        'accent_hover': '#106EBE',
+        'accent_light': '#0078D4',
 
         # Status Colors
-        'success': '#10B981',        # Green
-        'warning': '#F59E0B',        # Orange
-        'error': '#EF4444',          # Red
-        'info': '#3B82F6',           # Blue
+        'success': '#0F7B0F',        # Windows green
+        'warning': '#FFB900',        # Windows yellow
+        'error': '#FF4343',          # Windows red
+        'info': '#0078D4',           # Windows blue
 
-        # Badge Colors
-        'badge_base': '#2FA572',     # Green for BASE
-        'badge_base_light': '#E8F5E9',
-        'badge_base_hover': '#C8E6C9',
+        # Badge Colors (neutral in Win11 style)
+        'badge_base': '#0078D4',
+        'badge_base_light': '#383838',
+        'badge_base_hover': '#454545',
 
-        'badge_advanced': '#8B5CF6', # Purple for ADVANCED
-        'badge_advanced_light': '#F3E8FF',
-        'badge_advanced_hover': '#E9D5FF',
+        'badge_advanced': '#0078D4',
+        'badge_advanced_light': '#383838',
+        'badge_advanced_hover': '#454545',
 
         # Background Colors
-        'bg_primary': '#FFFFFF',
-        'bg_secondary': '#F9FAFB',
-        'bg_tertiary': '#F3F4F6',
-        'bg_dark': '#1F2937',
-        'bg_darker': '#111827',
+        'bg_primary': '#202020',
+        'bg_secondary': '#2D2D2D',
+        'bg_tertiary': '#383838',
+        'bg_dark': '#202020',
+        'bg_darker': '#1A1A1A',
 
         # Text Colors
-        'text_primary': '#111827',
-        'text_secondary': '#6B7280',
-        'text_tertiary': '#9CA3AF',
+        'text_primary': '#FFFFFF',
+        'text_secondary': '#9E9E9E',
+        'text_tertiary': '#717171',
         'text_light': '#FFFFFF',
 
         # Border Colors
-        'border_light': '#E5E7EB',
-        'border_medium': '#D1D5DB',
-        'border_dark': '#9CA3AF',
+        'border_light': '#3D3D3D',
+        'border_medium': '#454545',
+        'border_dark': '#555555',
 
         # Card/Panel Colors
-        'card_bg': '#FFFFFF',
-        'card_border': '#E5E7EB',
-        'card_shadow': 'rgba(0, 0, 0, 0.05)',
+        'card_bg': '#2D2D2D',
+        'card_border': '#3D3D3D',
+        'card_shadow': 'rgba(0, 0, 0, 0.1)',
 
-        # Frame Colors (CustomTkinter defaults)
-        'frame_bg': '#1E1E1E',  # Dark frame background
-        'frame_bg_light': '#2B2B2B',
+        # Frame Colors
+        'frame_bg': '#2D2D2D',
+        'frame_bg_light': '#2D2D2D',
     }
 
     # Typography
@@ -130,12 +130,12 @@ class Theme:
         'xxxl': 64
     }
 
-    # Border Radius
+    # Border Radius (Windows 11: 4-8px range)
     RADIUS = {
         'sm': 4,
-        'md': 8,
-        'lg': 12,
-        'xl': 16,
+        'md': 4,
+        'lg': 8,
+        'xl': 8,
         'full': 9999
     }
 
@@ -179,29 +179,8 @@ class Theme:
 
 
 class DarkTheme(Theme):
-    """Dark mode color overrides"""
+    """Dark mode color overrides (minimal - base Theme is now Win11 dark-native)"""
 
     COLORS = {
         **Theme.COLORS,
-
-        # Dark mode overrides
-        'bg_primary': '#1F2937',
-        'bg_secondary': '#111827',
-        'bg_tertiary': '#0F172A',
-        'bg_dark': '#0F172A',
-        'bg_darker': '#020617',
-
-        'text_primary': '#F9FAFB',
-        'text_secondary': '#D1D5DB',
-        'text_tertiary': '#9CA3AF',
-
-        'card_bg': '#1F2937',
-        'card_border': '#374151',
-
-        'border_light': '#374151',
-        'border_medium': '#4B5563',
-        'border_dark': '#6B7280',
-
-        'frame_bg': '#1E1E1E',
-        'frame_bg_light': '#2B2B2B',
     }

@@ -14,10 +14,9 @@ class PresetCard(ctk.CTkFrame):
 
     Shows:
     - Preset name + icon emoji
-    - Color-coded left border
     - Key highlights (checkmarks for benefits, X for limitations)
     - Stats (settings changed, privacy score, breakage risk)
-    - "Select" button
+    - "Select" button with thin border selection state
     """
 
     # Icon emojis for presets
@@ -69,10 +68,10 @@ class PresetCard(ctk.CTkFrame):
         self.configure(
             width=self.card_width,
             height=self.card_height,
-            fg_color="#1E1E1E",
-            corner_radius=10,
-            border_width=3 if selected else 2,
-            border_color=self.preset_color
+            fg_color="#2D2D2D",
+            corner_radius=8,
+            border_width=1,
+            border_color=self.preset_color if selected else "#3D3D3D"
         )
 
         # Build UI
@@ -80,15 +79,6 @@ class PresetCard(ctk.CTkFrame):
 
     def _build_ui(self):
         """Build card UI components"""
-        # Color bar on left edge (visual indicator)
-        color_bar = ctk.CTkFrame(
-            self,
-            width=4,
-            fg_color=self.preset_color,
-            corner_radius=0
-        )
-        color_bar.place(x=0, y=0, relheight=1)
-
         # Main content frame with padding
         content = ctk.CTkFrame(self, fg_color="transparent")
         content.pack(fill="both", expand=True, padx=15, pady=15)
@@ -117,12 +107,12 @@ class PresetCard(ctk.CTkFrame):
             anchor="w",
             justify="left",
             wraplength=240,
-            text_color="#B0B0B0"
+            text_color="#9E9E9E"
         )
         desc_label.pack(anchor="w", pady=(0, 10))
 
         # Divider
-        divider1 = ctk.CTkFrame(content, height=1, fg_color="#404040")
+        divider1 = ctk.CTkFrame(content, height=1, fg_color="#3D3D3D")
         divider1.pack(fill="x", pady=(5, 10))
 
         # Highlights section
@@ -132,25 +122,25 @@ class PresetCard(ctk.CTkFrame):
                 content,
                 height=180,
                 fg_color="transparent",
-                scrollbar_button_color="#404040",
-                scrollbar_button_hover_color="#505050"
+                scrollbar_button_color="#3D3D3D",
+                scrollbar_button_hover_color="#454545"
             )
             highlights_frame.pack(fill="x", pady=(0, 10))
 
             for highlight in highlights:
                 if highlight.startswith('✓'):
                     # Positive feature (green checkmark)
-                    color = "#2FA572"
+                    color = "#0F7B0F"
                     icon = "✓"
                     text = highlight[1:].strip()
                 elif highlight.startswith('✗'):
                     # Limitation (orange X)
-                    color = "#FFA726"
+                    color = "#FFB900"
                     icon = "✗"
                     text = highlight[1:].strip()
                 else:
                     # Neutral
-                    color = "#B0B0B0"
+                    color = "#9E9E9E"
                     icon = "•"
                     text = highlight
 
@@ -166,7 +156,7 @@ class PresetCard(ctk.CTkFrame):
                 highlight_label.pack(anchor="w", pady=2)
 
         # Divider
-        divider2 = ctk.CTkFrame(content, height=1, fg_color="#404040")
+        divider2 = ctk.CTkFrame(content, height=1, fg_color="#3D3D3D")
         divider2.pack(fill="x", pady=(10, 10))
 
         # Stats badges
@@ -181,7 +171,7 @@ class PresetCard(ctk.CTkFrame):
                 stats_frame,
                 text=f"⚙️ {settings_changed}",
                 font=ctk.CTkFont(size=11),
-                fg_color="#2B2B2B",
+                fg_color="#383838",
                 corner_radius=5,
                 padx=8,
                 pady=4
@@ -194,7 +184,7 @@ class PresetCard(ctk.CTkFrame):
                 stats_frame,
                 text=f"🛡️ {privacy_score}",
                 font=ctk.CTkFont(size=11),
-                fg_color="#2B2B2B",
+                fg_color="#383838",
                 corner_radius=5,
                 padx=8,
                 pady=4
@@ -205,13 +195,13 @@ class PresetCard(ctk.CTkFrame):
             breakage_risk = stats.get('breakage_risk', 'N/A')
             # Extract numeric risk for color coding
             if 'Very High' in breakage_risk or '(9' in breakage_risk or '(10' in breakage_risk:
-                risk_color = "#E74C3C"
+                risk_color = "#FF4343"
             elif 'High' in breakage_risk or '(7' in breakage_risk or '(8' in breakage_risk:
-                risk_color = "#FFA726"
+                risk_color = "#FFB900"
             elif 'Medium' in breakage_risk or '(4' in breakage_risk or '(5' in breakage_risk or '(6' in breakage_risk:
-                risk_color = "#F39C12"
+                risk_color = "#FFB900"
             else:
-                risk_color = "#2FA572"
+                risk_color = "#0F7B0F"
 
             stats_frame2 = ctk.CTkFrame(content, fg_color="transparent")
             stats_frame2.pack(fill="x", pady=(5, 0))
@@ -233,8 +223,8 @@ class PresetCard(ctk.CTkFrame):
             content,
             text="✨ Select This" if not self.selected else "✓ Selected",
             command=self.on_select,
-            fg_color=self.preset_color if not self.selected else "#2FA572",
-            hover_color=self._darken_color(self.preset_color) if not self.selected else "#238C5C",
+            fg_color=self.preset_color if not self.selected else "#0F7B0F",
+            hover_color=self._darken_color(self.preset_color) if not self.selected else "#0A5D0A",
             font=ctk.CTkFont(size=14, weight="bold"),
             height=40
         )
@@ -256,19 +246,22 @@ class PresetCard(ctk.CTkFrame):
 
             return f"#{r:02x}{g:02x}{b:02x}"
         except (ValueError, IndexError):  # FIX: Catch only expected exceptions
-            return "#666666"  # Fallback
+            return "#3D3D3D"  # Fallback
 
     def set_selected(self, selected: bool):
         """Update selected state - optimized to only update button"""
         self.selected = selected
 
-        # Update border width (visual feedback for selection)
-        self.configure(border_width=3 if selected else 2)
+        # Update border (visual feedback for selection)
+        self.configure(
+            border_width=2 if selected else 1,
+            border_color=self.preset_color if selected else "#3D3D3D"
+        )
 
         # Update button appearance only (no full rebuild needed)
         if self.select_button:
             self.select_button.configure(
                 text="✓ Selected" if selected else "✨ Select This",
-                fg_color="#2FA572" if selected else self.preset_color,
-                hover_color="#238C5C" if selected else self._darken_color(self.preset_color)
+                fg_color="#0F7B0F" if selected else self.preset_color,
+                hover_color="#0A5D0A" if selected else self._darken_color(self.preset_color)
             )

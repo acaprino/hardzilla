@@ -24,9 +24,9 @@ class StyledButton(ctk.CTkButton):
         color_map = {
             'primary': (Theme.get_color('primary'), Theme.get_color('primary_hover')),
             'secondary': (Theme.get_color('secondary'), Theme.get_color('secondary_hover')),
-            'success': (Theme.get_color('success'), '#059669'),
-            'warning': (Theme.get_color('warning'), '#D97706'),
-            'danger': (Theme.get_color('error'), '#DC2626'),
+            'success': (Theme.get_color('success'), '#0A5D0A'),
+            'warning': (Theme.get_color('warning'), '#E5A700'),
+            'danger': (Theme.get_color('error'), '#CC3333'),
             'ghost': ('transparent', Theme.get_color('bg_tertiary'))
         }
 
@@ -118,10 +118,10 @@ class Badge(ctk.CTkLabel):
     ):
         color_map = {
             'default': (Theme.get_color('bg_tertiary'), Theme.get_color('text_secondary')),
-            'success': (Theme.get_color('badge_base_light'), Theme.get_color('badge_base')),
-            'warning': ('#FEF3C7', Theme.get_color('warning')),
-            'error': ('#FEE2E2', Theme.get_color('error')),
-            'info': (Theme.get_color('primary_light'), Theme.get_color('primary')),
+            'success': (Theme.get_color('bg_tertiary'), Theme.get_color('success')),
+            'warning': (Theme.get_color('bg_tertiary'), Theme.get_color('warning')),
+            'error': (Theme.get_color('bg_tertiary'), Theme.get_color('error')),
+            'info': (Theme.get_color('bg_tertiary'), Theme.get_color('primary')),
             'base': (Theme.get_color('badge_base'), '#FFFFFF'),
             'advanced': (Theme.get_color('badge_advanced'), '#FFFFFF')
         }

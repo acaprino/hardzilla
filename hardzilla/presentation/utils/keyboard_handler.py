@@ -168,7 +168,7 @@ class KeyboardShortcutsDialog(ctk.CTkToplevel):
                 self._create_shortcut_row(scroll_frame, key, description)
 
             # Separator
-            separator = ctk.CTkFrame(scroll_frame, height=1, fg_color="gray")
+            separator = ctk.CTkFrame(scroll_frame, height=1, fg_color="#3D3D3D")
             separator.pack(fill="x", pady=10)
 
         # Close button
@@ -192,8 +192,8 @@ class KeyboardShortcutsDialog(ctk.CTkToplevel):
         # Key (in a styled frame)
         key_frame = ctk.CTkFrame(
             frame,
-            fg_color="#2B2B2B",
-            corner_radius=5
+            fg_color="#2D2D2D",
+            corner_radius=4
         )
         key_frame.grid(row=0, column=0, sticky="w", padx=(20, 15))
 
@@ -210,7 +210,7 @@ class KeyboardShortcutsDialog(ctk.CTkToplevel):
             frame,
             text=description,
             font=ctk.CTkFont(size=11),
-            text_color="#CCCCCC",
+            text_color="#9E9E9E",
             anchor="w"
         )
         desc_label.grid(row=0, column=1, sticky="w")

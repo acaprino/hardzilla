@@ -12,37 +12,36 @@ from hardzilla.domain.enums import SettingLevel, SettingType
 
 class SettingRow(ctk.CTkFrame):
     """
-    Polished setting row with visual badges and color coding.
+    Setting row with Windows 11 neutral styling.
 
     Features:
-    - [B] badge for BASE settings (green) - user-editable in Firefox
-    - [A] badge for ADVANCED settings (purple) - locked preferences
-    - Color-coded backgrounds
+    - BASE/ADV text label indicating setting level
+    - Neutral card surface with subtle border
     - Hover tooltips with full descriptions
     - Interactive controls based on setting type
     """
 
-    # Color scheme - High contrast for better readability
+    # Color scheme - Windows 11 neutral style
     COLORS = {
         'BASE': {
-            'badge_bg': '#2FA572',  # Green
-            'badge_fg': '#FFFFFF',
-            'row_bg': '#2B2B2B',    # Dark neutral background
-            'hover_bg': '#353535',   # Slightly lighter on hover
-            'border': '#2FA572',     # Green accent border
-            'text_primary': '#FFFFFF',      # White for setting name
-            'text_secondary': '#B0B0B0',    # Light gray for metadata
-            'text_description': '#E0E0E0'   # Off-white for descriptions
+            'badge_bg': 'transparent',
+            'badge_fg': '#9E9E9E',
+            'row_bg': '#2D2D2D',
+            'hover_bg': '#383838',
+            'border': '#3D3D3D',
+            'text_primary': '#FFFFFF',
+            'text_secondary': '#9E9E9E',
+            'text_description': '#E0E0E0'
         },
         'ADVANCED': {
-            'badge_bg': '#7B68EE',  # Purple
-            'badge_fg': '#FFFFFF',
-            'row_bg': '#2B2B2B',    # Dark neutral background
-            'hover_bg': '#353535',   # Slightly lighter on hover
-            'border': '#7B68EE',     # Purple accent border
-            'text_primary': '#FFFFFF',      # White for setting name
-            'text_secondary': '#B0B0B0',    # Light gray for metadata
-            'text_description': '#E0E0E0'   # Off-white for descriptions
+            'badge_bg': 'transparent',
+            'badge_fg': '#9E9E9E',
+            'row_bg': '#2D2D2D',
+            'hover_bg': '#383838',
+            'border': '#3D3D3D',
+            'text_primary': '#FFFFFF',
+            'text_secondary': '#9E9E9E',
+            'text_description': '#E0E0E0'
         }
     }
 
@@ -73,8 +72,8 @@ class SettingRow(ctk.CTkFrame):
         self.configure(
             fg_color=self.colors['row_bg'],
             border_color=self.colors['border'],
-            border_width=2,
-            corner_radius=8
+            border_width=1,
+            corner_radius=4
         )
 
         # Build UI
@@ -89,30 +88,30 @@ class SettingRow(ctk.CTkFrame):
         # Configure grid
         self.grid_columnconfigure(1, weight=1)
 
-        # Badge - LARGER for better visibility
-        badge_text = 'B' if self.setting.level == SettingLevel.BASE else 'A'
+        # Badge - small text label (Win11 style)
+        badge_text = 'BASE' if self.setting.level == SettingLevel.BASE else 'ADV'
         badge = ctk.CTkLabel(
             self,
             text=badge_text,
-            width=42,
-            height=42,
-            font=ctk.CTkFont(size=16, weight="bold"),
-            fg_color=self.colors['badge_bg'],
+            width=36,
+            height=20,
+            font=ctk.CTkFont(size=9),
+            fg_color="transparent",
             text_color=self.colors['badge_fg'],
-            corner_radius=6
+            corner_radius=0
         )
-        badge.grid(row=0, column=0, padx=(12, 8), pady=(12, 10), sticky="nw")
+        badge.grid(row=0, column=0, padx=(8, 4), pady=(6, 4), sticky="nw")
 
-        # Setting info frame - More padding for better spacing
+        # Setting info frame
         info_frame = ctk.CTkFrame(self, fg_color="transparent")
-        info_frame.grid(row=0, column=1, padx=8, pady=(12, 12), sticky="ew")
+        info_frame.grid(row=0, column=1, padx=4, pady=(4, 4), sticky="ew")
         info_frame.grid_columnconfigure(0, weight=1)
 
-        # Setting name (full key for clarity) - LARGER for readability
+        # Setting name
         name_label = ctk.CTkLabel(
             info_frame,
             text=self.setting.key,
-            font=ctk.CTkFont(size=15, weight="bold"),
+            font=ctk.CTkFont(size=13, weight="bold"),
             text_color=self.colors['text_primary'],
             anchor="w"
         )
@@ -132,53 +131,53 @@ class SettingRow(ctk.CTkFrame):
         meta_label = ctk.CTkLabel(
             info_frame,
             text=meta_text,
-            font=ctk.CTkFont(size=13),
+            font=ctk.CTkFont(size=11),
             text_color=self.colors['text_secondary'],
             anchor="w"
         )
-        meta_label.grid(row=1, column=0, sticky="w", pady=(2, 0))
+        meta_label.grid(row=1, column=0, sticky="w", pady=(1, 0))
 
-        # Description (if enabled) - LARGER for readability
+        # Description (if enabled)
         if self.show_description and self.setting.description:
             desc_label = ctk.CTkLabel(
                 info_frame,
                 text=self.setting.description,
-                font=ctk.CTkFont(size=14),
+                font=ctk.CTkFont(size=11),
                 text_color=self.colors['text_description'],
                 anchor="w",
-                wraplength=700,
+                wraplength=600,
                 justify="left"
             )
-            desc_label.grid(row=2, column=0, sticky="w", pady=(5, 0))
+            desc_label.grid(row=2, column=0, sticky="w", pady=(2, 0))
 
-        # Warning if high breakage - LARGER and more visible
+        # Warning if high breakage
         if self.setting.breakage_score > 5:
             warning_label = ctk.CTkLabel(
                 info_frame,
-                text=f"⚠ Warning: May break some websites (risk: {self.setting.breakage_score}/10)",
-                font=ctk.CTkFont(size=13, weight="bold"),
-                text_color="#FFA726",
+                text=f"⚠ Risk: {self.setting.breakage_score}/10 - may break sites",
+                font=ctk.CTkFont(size=11, weight="bold"),
+                text_color="#FFB900",
                 anchor="w"
             )
-            warning_label.grid(row=3, column=0, sticky="w", pady=(3, 0))
+            warning_label.grid(row=3, column=0, sticky="w", pady=(1, 0))
 
-        # Additional warning text - LARGER and more visible
+        # Additional warning text
         if self.setting.warning:
             extra_warning = ctk.CTkLabel(
                 info_frame,
                 text=f"Note: {self.setting.warning}",
-                font=ctk.CTkFont(size=13),
-                text_color="#FFD54F",
+                font=ctk.CTkFont(size=11),
+                text_color="#FFB900",
                 anchor="w",
-                wraplength=700,
+                wraplength=600,
                 justify="left"
             )
-            extra_warning.grid(row=4, column=0, sticky="w", pady=(2, 0))
+            extra_warning.grid(row=4, column=0, sticky="w", pady=(1, 0))
 
-        # Control widget - Better positioning
+        # Control widget
         control = self._create_control()
         if control:
-            control.grid(row=0, column=2, rowspan=5, padx=15, pady=15, sticky="ne")
+            control.grid(row=0, column=2, rowspan=5, padx=8, pady=6, sticky="ne")
 
         # Create tooltip
         self._create_tooltip()
@@ -395,7 +394,7 @@ class SettingTooltip(ctk.CTkToplevel):
         self.attributes('-topmost', True)  # Always on top
 
         # Style
-        self.configure(fg_color="#2B2B2B")
+        self.configure(fg_color="#2D2D2D")
 
         # Content
         label = ctk.CTkLabel(

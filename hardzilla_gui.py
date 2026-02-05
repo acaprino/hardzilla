@@ -183,8 +183,8 @@ class HardzillaGUI(ctk.CTk):
         """Build application header with enhanced styling"""
         header_frame = ctk.CTkFrame(
             parent,
-            fg_color="#1E293B",
-            corner_radius=12,
+            fg_color="#2D2D2D",
+            corner_radius=8,
             height=80
         )
         header_frame.grid_columnconfigure(1, weight=1)
@@ -211,7 +211,7 @@ class HardzillaGUI(ctk.CTk):
             header_frame,
             text="Firefox Privacy & Security Configurator",
             font=ctk.CTkFont(size=13),
-            text_color="#94A3B8"
+            text_color="#9E9E9E"
         )
         subtitle.grid(row=1, column=1, sticky="w", pady=(0, 15))
 
@@ -625,7 +625,7 @@ class HardzillaGUI(ctk.CTk):
             info_window,
             text="✓",
             font=ctk.CTkFont(size=48),
-            text_color="#2FA572"
+            text_color="#0F7B0F"
         ).pack(pady=(20, 10))
 
         ctk.CTkLabel(
@@ -639,9 +639,26 @@ class HardzillaGUI(ctk.CTk):
             info_window,
             text="OK",
             command=info_window.destroy,
-            fg_color="#2FA572",
-            hover_color="#238C5C"
+            fg_color="#0078D4",
+            hover_color="#106EBE"
         ).pack(pady=10)
+
+
+def _apply_mica_effect(window):
+    """Apply Windows 11 Mica backdrop effect if available."""
+    try:
+        import pywinstyles
+        import sys
+        version = sys.getwindowsversion()
+        if version.major == 10 and version.build >= 22000:
+            pywinstyles.apply_style(window, "mica")
+            pywinstyles.change_header_color(window, "#202020")
+            pywinstyles.change_title_color(window, "#ffffff")
+            logger.info("Applied Windows 11 Mica backdrop effect")
+    except ImportError:
+        logger.debug("pywinstyles not installed, skipping Mica effect")
+    except Exception as e:
+        logger.debug("Could not apply Mica effect: %s", e)
 
 
 def main():
@@ -652,6 +669,10 @@ def main():
 
     # Create and run application
     app = HardzillaGUI()
+
+    # Apply Windows 11 Mica backdrop (optional)
+    _apply_mica_effect(app)
+
     app.mainloop()
 
 

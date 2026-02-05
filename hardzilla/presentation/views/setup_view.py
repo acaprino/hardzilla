@@ -149,7 +149,7 @@ class SetupView(ctk.CTkScrollableFrame):
 
     def _build_json_import(self):
         """Build JSON profile import section"""
-        section = ctk.CTkFrame(self, fg_color=Theme.get_color('frame_bg'), corner_radius=10)
+        section = ctk.CTkFrame(self, fg_color=Theme.get_color('frame_bg'), corner_radius=8)
         section.grid(row=2, column=0, pady=10, sticky="ew", padx=10)
         section.grid_columnconfigure(1, weight=1)
 
@@ -193,7 +193,7 @@ class SetupView(ctk.CTkScrollableFrame):
 
     def _build_quick_presets(self):
         """Build quick preset selection cards"""
-        section = ctk.CTkFrame(self, fg_color=Theme.get_color('frame_bg'), corner_radius=10)
+        section = ctk.CTkFrame(self, fg_color=Theme.get_color('frame_bg'), corner_radius=8)
         section.grid(row=3, column=0, pady=10, sticky="ew", padx=10)
 
         # Header
@@ -208,7 +208,7 @@ class SetupView(ctk.CTkScrollableFrame):
             section,
             text="Select a preset that matches your needs - you can customize individual settings in the next step",
             font=ctk.CTkFont(size=13),
-            text_color="gray",
+            text_color="#9E9E9E",
             wraplength=800
         )
         subtitle.pack(padx=20, pady=(0, 10))
@@ -253,7 +253,7 @@ class SetupView(ctk.CTkScrollableFrame):
         divider_frame.grid_columnconfigure((0, 2), weight=1)
 
         # Left line
-        left_line = ctk.CTkFrame(divider_frame, height=2, fg_color="gray")
+        left_line = ctk.CTkFrame(divider_frame, height=2, fg_color="#3D3D3D")
         left_line.grid(row=0, column=0, sticky="ew", padx=(0, 10))
 
         # OR text
@@ -261,12 +261,12 @@ class SetupView(ctk.CTkScrollableFrame):
             divider_frame,
             text="OR CUSTOMIZE MANUALLY",
             font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="gray"
+            text_color="#9E9E9E"
         )
         or_label.grid(row=0, column=1)
 
         # Right line
-        right_line = ctk.CTkFrame(divider_frame, height=2, fg_color="gray")
+        right_line = ctk.CTkFrame(divider_frame, height=2, fg_color="#3D3D3D")
         right_line.grid(row=0, column=2, sticky="ew", padx=(10, 0))
 
     def _build_intent_questions(self):
@@ -355,8 +355,8 @@ class SetupView(ctk.CTkScrollableFrame):
             section,
             text="Generate Recommendation",
             command=self._on_generate_clicked,
-            fg_color="#2FA572",
-            hover_color="#238C5C",
+            fg_color="#0078D4",
+            hover_color="#106EBE",
             font=ctk.CTkFont(size=14, weight="bold"),
             height=40
         )
@@ -370,7 +370,7 @@ class SetupView(ctk.CTkScrollableFrame):
 
     def _build_navigation(self):
         """Build navigation buttons"""
-        nav_frame = ctk.CTkFrame(self, fg_color=Theme.get_color('frame_bg'), corner_radius=10)
+        nav_frame = ctk.CTkFrame(self, fg_color=Theme.get_color('frame_bg'), corner_radius=8)
         nav_frame.grid(row=5, column=0, pady=20, sticky="ew", padx=10)
         nav_frame.grid_columnconfigure(0, weight=1)
 
@@ -379,7 +379,7 @@ class SetupView(ctk.CTkScrollableFrame):
             nav_frame,
             text="",
             font=ctk.CTkFont(size=12),
-            text_color="#888888"
+            text_color="#9E9E9E"
         )
         self.nav_status_label.grid(row=0, column=0, padx=20, pady=(10, 5), sticky="w")
 
@@ -391,7 +391,7 @@ class SetupView(ctk.CTkScrollableFrame):
             state="disabled",
             font=ctk.CTkFont(size=16, weight="bold"),
             height=50,
-            fg_color=Theme.get_color('badge_base'),
+            fg_color=Theme.get_color('primary'),
             hover_color=Theme.get_color('secondary_hover')
         )
         self.next_btn.grid(row=1, column=0, padx=20, pady=(5, 15), sticky="ew")
@@ -479,7 +479,7 @@ class SetupView(ctk.CTkScrollableFrame):
         """Show successful import message"""
         self.import_status_label.configure(
             text=f"✓ Loaded {settings_count} settings from Firefox profile",
-            text_color=Theme.get_color('badge_base')
+            text_color=Theme.get_color('primary')
         )
 
     def _import_json_profile(self):
@@ -519,7 +519,7 @@ class SetupView(ctk.CTkScrollableFrame):
         """Show successful JSON import message"""
         self.json_status_label.configure(
             text=f"✓ Loaded '{profile_name}' with {settings_count} settings",
-            text_color=Theme.get_color('badge_base')
+            text_color=Theme.get_color('primary')
         )
 
     def show_json_import_error(self, error_msg: str):
@@ -609,7 +609,7 @@ class SetupView(ctk.CTkScrollableFrame):
         use_btn = ctk.CTkButton(
             self.recommendation_frame,
             text="Use This Configuration",
-            fg_color="#2FA572",
+            fg_color="#0078D4",
             command=lambda: self.view_model.set_property('selected_preset', profile.name)
         )
         use_btn.pack(padx=10, pady=10)
@@ -623,7 +623,7 @@ class SetupView(ctk.CTkScrollableFrame):
         if can_proceed:
             self.nav_status_label.configure(
                 text="✓ Ready to proceed",
-                text_color=Theme.get_color('badge_base')
+                text_color=Theme.get_color('primary')
             )
         else:
             # Check what's missing
@@ -692,7 +692,7 @@ class SetupView(ctk.CTkScrollableFrame):
             self.recommendation_frame,
             text=f"✓ Selected: {preset_data['name']}",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color=Theme.get_color('badge_base')
+            text_color=Theme.get_color('primary')
         )
         title.pack(padx=10, pady=(10, 5))
 
@@ -701,7 +701,7 @@ class SetupView(ctk.CTkScrollableFrame):
             self.recommendation_frame,
             text=preset_data.get('description', ''),
             font=ctk.CTkFont(size=14),
-            text_color="#B0B0B0",
+            text_color="#9E9E9E",
             wraplength=600
         )
         desc.pack(padx=10, pady=5)
@@ -732,8 +732,8 @@ class SetupView(ctk.CTkScrollableFrame):
             # All set - show next instruction
             next_instruction = ctk.CTkLabel(
                 self.recommendation_frame,
-                text="✓ Click the big green 'Next' button below to customize settings →",
+                text="✓ Click 'Next' below to customize settings →",
                 font=ctk.CTkFont(size=14, weight="bold"),
-                text_color=Theme.get_color('badge_base')
+                text_color=Theme.get_color('primary')
             )
             next_instruction.pack(padx=10, pady=(10, 15))

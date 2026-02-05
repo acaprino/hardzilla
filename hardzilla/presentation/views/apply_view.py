@@ -114,7 +114,7 @@ class ApplyView(ctk.CTkScrollableFrame):
             section,
             text="💡 Tip: Rename to save a customized version without overwriting the original",
             font=ctk.CTkFont(size=11),
-            text_color="#888888"
+            text_color="#9E9E9E"
         )
         info_label.pack(padx=20, pady=(0, 10))
 
@@ -143,12 +143,12 @@ class ApplyView(ctk.CTkScrollableFrame):
         self.mode_var = ctk.StringVar(value="BOTH")
 
         modes = [
-            ("Apply BOTH (Recommended)", "BOTH", "#2FA572"),
-            ("Apply BASE only (prefs.js)", "BASE", "#3B8ED0"),
-            ("Apply ADVANCED only (user.js)", "ADVANCED", "#9B59B6")
+            ("Apply BOTH (Recommended)", "BOTH"),
+            ("Apply BASE only (prefs.js)", "BASE"),
+            ("Apply ADVANCED only (user.js)", "ADVANCED")
         ]
 
-        for label, value, color in modes:
+        for label, value in modes:
             rb = ctk.CTkRadioButton(
                 section,
                 text=label,
@@ -176,7 +176,7 @@ class ApplyView(ctk.CTkScrollableFrame):
             section,
             text="⚠️  Important: Close Firefox before applying!",
             font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="#FFA500"
+            text_color="#FFB900"
         )
         warning_label.pack(padx=20, pady=10)
 
@@ -197,8 +197,8 @@ class ApplyView(ctk.CTkScrollableFrame):
             nav_frame,
             text="Apply Settings",
             command=self._on_apply_clicked,
-            fg_color="#2FA572",
-            hover_color="#238C5C",
+            fg_color="#0078D4",
+            hover_color="#106EBE",
             font=ctk.CTkFont(size=14, weight="bold"),
             height=40
         )
