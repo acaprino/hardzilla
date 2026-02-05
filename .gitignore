@@ -45,7 +45,7 @@ desktop.ini
 .env
 .env.local
 
-# Hardzilla specific
+# Hardfox specific
 profiles/
 *.xpi
 

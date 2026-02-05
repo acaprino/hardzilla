@@ -1,4 +1,4 @@
-# Hardzilla v4.0 - Firefox Hardening Tool
+# Hardfox v4.0 - Firefox Hardening Tool
 
 **Intent-Based Firefox Privacy Configuration**
 
@@ -12,10 +12,10 @@ Transform your Firefox browser from default to privacy-hardened in under 60 seco
 
 ```bash
 # Windows
-launch_hardzilla.bat
+launch_hardfox.bat
 
 # Or directly
-python hardzilla_gui.py
+python hardfox_gui.py
 ```
 
 ### First-Time Setup (60 seconds)
@@ -51,7 +51,7 @@ Your Input:
 - Privacy: Strong
 - Tolerance: 40%
 
-Hardzilla Creates:
+Hardfox Creates:
 - Profile: "Banking - Privacy Pro"
 - 31 BASE settings (prefs.js)
 - 47 ADVANCED settings (user.js)
@@ -60,7 +60,7 @@ Hardzilla Creates:
 
 ### Smart Decision-Making
 
-Hardzilla's IntentAnalyzer applies domain expertise:
+Hardfox's IntentAnalyzer applies domain expertise:
 
 - **Banking** → Strict fingerprinting protection + DoH enabled
 - **Shopping** → Allow necessary payment cookies
@@ -96,7 +96,7 @@ Hardzilla's IntentAnalyzer applies domain expertise:
 ### Layered Design
 
 ```
-hardzilla/
+hardfox/
 ├── domain/              Pure business logic (entities, rules)
 │   ├── entities/        Setting, Profile
 │   ├── enums/          SettingLevel, SettingType
@@ -215,13 +215,13 @@ python -m pytest tests/ -v
 
 ```bash
 # Run demo (shows intent analysis)
-python hardzilla_main.py
+python hardfox_main.py
 
 # Apply profile to Firefox
-python hardzilla_main.py --apply "C:/path/to/profile" "Banking - Privacy Pro"
+python hardfox_main.py --apply "C:/path/to/profile" "Banking - Privacy Pro"
 
 # Show help
-python hardzilla_main.py --help
+python hardfox_main.py --help
 ```
 
 ### Profile Management
@@ -232,12 +232,12 @@ python hardzilla_main.py --help
 - Reuse later or share with others
 
 **Load Existing Profile:**
-- Use CLI: `python hardzilla_main.py --apply <path> <profile_name>`
+- Use CLI: `python hardfox_main.py --apply <path> <profile_name>`
 - Or import in GUI (feature coming)
 
 ### Custom Metadata
 
-Edit `hardzilla/metadata/settings_metadata.py` to:
+Edit `hardfox/metadata/settings_metadata.py` to:
 - Add new Firefox settings
 - Modify intent tags
 - Adjust breakage scores
@@ -257,7 +257,7 @@ python --version
 pip install customtkinter
 
 # Try direct launch
-python hardzilla_gui.py
+python hardfox_gui.py
 ```
 
 ### Settings Not Applied
@@ -365,7 +365,7 @@ This is currently a single-developer project, but contributions are welcome!
 
 - **Issues**: [GitHub Issues](your-repo-url)
 - **Documentation**: See `GUI_COMPLETE.md`
-- **CLI Help**: `python hardzilla_main.py --help`
+- **CLI Help**: `python hardfox_main.py --help`
 
 ---
 

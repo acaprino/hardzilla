@@ -1,7 +1,7 @@
 """
 Standalone portable Firefox updater.
 
-Compiled to UpdateFirefox.exe with PyInstaller. Self-contained — no hardzilla imports.
+Compiled to UpdateFirefox.exe with PyInstaller. Self-contained — no hardfox imports.
 Detects its own location as the portable root, checks for updates, and performs
 an in-place upgrade with atomic directory swap.
 
@@ -23,7 +23,7 @@ import tempfile
 import threading
 import tkinter as tk
 from datetime import datetime, timezone
-from tkinter import ttk, messagebox
+from tkinter import ttk
 import urllib.error
 import urllib.request
 
@@ -75,7 +75,7 @@ def get_latest_version():
     """Fetch latest Firefox version from Mozilla API."""
     req = urllib.request.Request(
         VERSIONS_URL,
-        headers={"User-Agent": "HardzillaUpdater/1.0"}
+        headers={"User-Agent": "HardfoxUpdater/1.0"}
     )
     with urllib.request.urlopen(req, timeout=15) as resp:
         data = json.loads(resp.read().decode("utf-8"))
@@ -99,7 +99,7 @@ def fetch_expected_hash(version):
     url = SHA512_URL_TEMPLATE.format(version=version)
     installer_filename = f"win64/en-US/Firefox Setup {version}.exe"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "HardzillaUpdater/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "HardfoxUpdater/1.0"})
         with urllib.request.urlopen(req, timeout=15) as resp:
             content = resp.read().decode("utf-8")
         for line in content.splitlines():
@@ -247,14 +247,6 @@ class UpdaterApp:
         self.update_btn.config(state="normal")
 
     def _on_update(self):
-        if not messagebox.askyesno(
-            "Update Firefox",
-            f"Update Firefox from {self.current_version} to {self.latest_version}?\n\n"
-            "Make sure Firefox is not running.\n"
-            "Your profile data will be preserved."
-        ):
-            return
-
         self.update_btn.config(state="disabled")
         self.cancel_btn.config(text="Cancel", command=self._on_cancel)
         self.cancel_event.clear()
@@ -291,7 +283,7 @@ class UpdaterApp:
             max_retries = 2
             for attempt in range(1, max_retries + 1):
                 try:
-                    req = urllib.request.Request(url, headers={"User-Agent": "HardzillaUpdater/1.0"})
+                    req = urllib.request.Request(url, headers={"User-Agent": "HardfoxUpdater/1.0"})
                     with urllib.request.urlopen(req, timeout=60) as resp:
                         total = int(resp.headers.get("Content-Length", 0))
                         downloaded = 0

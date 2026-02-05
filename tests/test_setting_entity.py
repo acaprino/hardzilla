@@ -10,8 +10,8 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hardzilla.domain.entities.setting import Setting
-from hardzilla.domain.enums import SettingLevel, SettingType
+from hardfox.domain.entities.setting import Setting
+from hardfox.domain.enums import SettingLevel, SettingType
 
 
 class TestSettingValidation:

@@ -11,8 +11,8 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hardzilla.infrastructure.persistence.json_profile_repository import JsonProfileRepository
-from hardzilla.infrastructure.persistence.metadata_settings_repository import MetadataSettingsRepository
+from hardfox.infrastructure.persistence.json_profile_repository import JsonProfileRepository
+from hardfox.infrastructure.persistence.metadata_settings_repository import MetadataSettingsRepository
 
 
 class TestPathTraversalPrevention:

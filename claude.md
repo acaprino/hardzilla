@@ -1,6 +1,6 @@
-# Hardzilla - Firefox Hardening Tool
+# Hardfox - Firefox Hardening Tool
 
-**Hardzilla** is a Python desktop GUI application for Firefox privacy and security hardening. It provides a user-friendly interface to configure 78+ Firefox privacy settings with preset profiles and granular control.
+**Hardfox** is a Python desktop GUI application for Firefox privacy and security hardening. It provides a user-friendly interface to configure 78+ Firefox privacy settings with preset profiles and granular control.
 
 **Tech Stack**: Python 3.6+, CustomTkinter, Tkinter, Windows-focused (cross-platform compatible)
 
@@ -14,24 +14,24 @@
 ## Architecture
 
 ```
-hardzilla.py              (3,579 lines) - Main GUI, CustomTkinter UI, apply logic
-hardzilla_metadata.py     (2,647 lines) - 78+ settings metadata, categories, presets
-hardzilla_widgets.py      (547 lines)   - Custom UI components (CategorySlider, SettingRow)
-hardzilla_profiles.py     (539 lines)   - ProfileManager, FirefoxImporter
-launch_hardzilla.bat      - Dependency checker & launcher
+hardfox.py              (3,579 lines) - Main GUI, CustomTkinter UI, apply logic
+hardfox_metadata.py     (2,647 lines) - 78+ settings metadata, categories, presets
+hardfox_widgets.py      (547 lines)   - Custom UI components (CategorySlider, SettingRow)
+hardfox_profiles.py     (539 lines)   - ProfileManager, FirefoxImporter
+launch_hardfox.bat      - Dependency checker & launcher
 ```
 
 ### Module Responsibilities
 
-- **hardzilla.py**: Main application, UI rendering, settings application logic, preset handling
-- **hardzilla_metadata.py**: Single source of truth for settings (descriptions, warnings, levels, categories, presets)
-- **hardzilla_widgets.py**: Reusable UI components (CategorySlider, SettingRow, etc.)
-- **hardzilla_profiles.py**: Profile detection, import/export, Firefox integration
+- **hardfox.py**: Main application, UI rendering, settings application logic, preset handling
+- **hardfox_metadata.py**: Single source of truth for settings (descriptions, warnings, levels, categories, presets)
+- **hardfox_widgets.py**: Reusable UI components (CategorySlider, SettingRow, etc.)
+- **hardfox_profiles.py**: Profile detection, import/export, Firefox integration
 
 ### Core Design Patterns
 
 **Metadata-Driven Architecture**: Settings defined with complete metadata (descriptions, warnings, levels, mechanisms)
-- All settings in `SETTINGS_METADATA` dictionary in hardzilla_metadata.py
+- All settings in `SETTINGS_METADATA` dictionary in hardfox_metadata.py
 - Each setting includes: `name`, `description`, `default`, `level`, `mechanism`, `category`, `subcategory`, `warning`, `prefs`
 - Settings organized into categories (Performance, Privacy, Security, Features) with subcategories
 
@@ -39,7 +39,7 @@ launch_hardzilla.bat      - Dependency checker & launcher
 - **BASE**: Applied via `prefs.js` (Firefox preferences file) - user-configurable via Firefox UI
 - **ADVANCED**: Applied via `user.js` (user overrides, higher precedence) - loaded every startup
 
-**Preset System**: 6 curated configurations stored in `PRESET_PROFILES` constant (hardzilla_metadata.py):
+**Preset System**: 6 curated configurations stored in `PRESET_PROFILES` constant (hardfox_metadata.py):
 - Developer: Minimal restrictions, debugging tools enabled
 - Office Worker: Moderate privacy, browser compatibility maintained
 - Privacy Enthusiast: Strong privacy, minor breakage acceptable
@@ -55,7 +55,7 @@ launch_hardzilla.bat      - Dependency checker & launcher
 
 **Adding New Firefox Settings**:
 1. Reference [arkenfox user.js](https://github.com/arkenfox/user.js) and [Mozilla documentation](https://firefox-source-docs.mozilla.org/)
-2. Add setting to `SETTINGS_METADATA` dictionary in `hardzilla_metadata.py`
+2. Add setting to `SETTINGS_METADATA` dictionary in `hardfox_metadata.py`
 3. Follow existing metadata structure (description, warning, level, mechanism, category)
 4. Add to appropriate category/subcategory
 5. Update preset profiles if the setting should be included
@@ -79,7 +79,7 @@ launch_hardzilla.bat      - Dependency checker & launcher
 - Reducing code duplication
 - Simplifying conditional logic
 - Improving function/variable naming
-- Extracting reusable components to hardzilla_widgets.py
+- Extracting reusable components to hardfox_widgets.py
 
 ### Documentation
 
@@ -93,12 +93,12 @@ launch_hardzilla.bat      - Dependency checker & launcher
 
 - **Primary Platform**: Windows with graceful fallbacks for cross-platform compatibility
 - **pywinstyles**: Optional dependency for acrylic/mica window effects
-- **Batch Launcher**: `launch_hardzilla.bat` handles dependency installation and Python environment setup
+- **Batch Launcher**: `launch_hardfox.bat` handles dependency installation and Python environment setup
 
 ## Testing & Verification
 
 **Manual Testing Approach**:
-1. Run `python hardzilla.py` or `launch_hardzilla.bat`
+1. Run `python hardfox.py` or `launch_hardfox.bat`
 2. Test affected features in the GUI
 3. Apply settings to a Firefox profile
 4. Check generated files in Firefox profile directory:
@@ -115,18 +115,18 @@ launch_hardzilla.bat      - Dependency checker & launcher
 ## Critical Files & Constants
 
 **Key Files**:
-- `hardzilla_metadata.py`: Settings definitions, categories, presets
-- `hardzilla.py`: Main application loop, UI rendering
-- `hardzilla_profiles.py`: `ProfileManager`, `FirefoxImporter` classes
+- `hardfox_metadata.py`: Settings definitions, categories, presets
+- `hardfox.py`: Main application loop, UI rendering
+- `hardfox_profiles.py`: `ProfileManager`, `FirefoxImporter` classes
 - `GUI_README.md`: User documentation
 
-**Important Constants** (hardzilla_metadata.py):
+**Important Constants** (hardfox_metadata.py):
 - `SETTINGS_METADATA`: Dictionary of all 78+ Firefox settings
 - `CATEGORIES`: List of categories for UI organization
 - `PRESET_PROFILES`: 6 preset configurations
-- `COLORS`: Color scheme for CustomTkinter theme (in hardzilla.py)
+- `COLORS`: Color scheme for CustomTkinter theme (in hardfox.py)
 
-**Important Functions** (hardzilla_metadata.py):
+**Important Functions** (hardfox_metadata.py):
 - `get_base_settings()`: Returns settings with level="BASE"
 - `get_advanced_settings()`: Returns settings with level="ADVANCED"
 
@@ -135,7 +135,7 @@ launch_hardzilla.bat      - Dependency checker & launcher
 ### Adding a New Firefox Setting
 
 ```python
-# In hardzilla_metadata.py SETTINGS_METADATA dictionary:
+# In hardfox_metadata.py SETTINGS_METADATA dictionary:
 "privacy.newfeature.enabled": {
     "description": "Brief explanation of what this does",
     "warning": "Privacy trade-off or functionality impact",
@@ -155,14 +155,14 @@ launch_hardzilla.bat      - Dependency checker & launcher
 
 ### Creating a New Category
 
-1. Add category name to `CATEGORIES` list in `hardzilla_metadata.py`
+1. Add category name to `CATEGORIES` list in `hardfox_metadata.py`
 2. Add settings with `"category": "New Category Name"`
 3. Update UI color scheme in `COLORS` if needed (category-specific colors)
 
 ### Modifying a Preset Profile
 
 ```python
-# In hardzilla_metadata.py PRESET_PROFILES dictionary:
+# In hardfox_metadata.py PRESET_PROFILES dictionary:
 "privacy_enthusiast": {
     "name": "Privacy Enthusiast",
     # ... other metadata ...
@@ -172,10 +172,10 @@ launch_hardzilla.bat      - Dependency checker & launcher
 
 ### Adding a New UI Widget
 
-1. Create widget class in `hardzilla_widgets.py`
+1. Create widget class in `hardfox_widgets.py`
 2. Inherit from appropriate CustomTkinter base class
 3. Implement reusable component with consistent styling
-4. Import and use in `hardzilla.py`
+4. Import and use in `hardfox.py`
 
 ## External References
 

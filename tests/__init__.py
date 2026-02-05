@@ -1,3 +1,3 @@
 """
-Hardzilla v4.0 Test Suite
+Hardfox v4.0 Test Suite
 """
