@@ -267,15 +267,30 @@ class FirefoxExtensionRepository(IExtensionRepository):
         logger.info(f"Merged {len(new_extension_settings)} extension settings")
         return existing_policies
 
+    # uBlock Origin default filter lists (must be included with adminSettings)
+    UBLOCK_DEFAULT_FILTER_LISTS = [
+        "user-filters",
+        "ublock-filters",
+        "ublock-badware",
+        "ublock-privacy",
+        "ublock-abuse",
+        "ublock-unbreak",
+        "easylist",
+        "easyprivacy",
+        "urlhaus-1",
+        "plowe-0",
+    ]
+
     def _build_third_party_config(self, extension_settings: dict) -> dict:
         """
         Build 3rdparty extension configuration for extensions that support it.
 
         Currently supports:
-        - uBlock Origin: custom filter lists via toAdd.filterLists (1.33.0+)
+        - uBlock Origin: custom filter lists via adminSettings.selectedFilterLists
 
-        Uses the modern managed storage format that adds custom filter lists
-        on top of uBlock's defaults without overriding user selections.
+        Uses adminSettings which is the only method confirmed working on Firefox/Windows.
+        Note: toAdd.filterLists (issue #2545) and toOverwrite (issue #3685) do NOT work
+        on Firefox/Windows.
 
         Args:
             extension_settings: Dictionary of extension IDs being installed
@@ -291,16 +306,20 @@ class FirefoxExtensionRepository(IExtensionRepository):
 
             ext_data = EXTENSIONS_METADATA[ext_id]
 
-            # uBlock Origin custom filter lists (toAdd format, 1.33.0+)
+            # uBlock Origin custom filter lists (adminSettings format)
             if ext_id == "uBlock0@raymondhill.net" and "custom_filter_lists" in ext_data:
-                filter_lists = ext_data["custom_filter_lists"]
-                if filter_lists:
+                custom_lists = ext_data["custom_filter_lists"]
+                if custom_lists:
+                    all_lists = self.UBLOCK_DEFAULT_FILTER_LISTS + list(custom_lists)
                     config[ext_id] = {
-                        "toAdd": {
-                            "filterLists": list(filter_lists)
+                        "adminSettings": {
+                            "selectedFilterLists": all_lists
                         }
                     }
-                    logger.info(f"Configured uBlock Origin with {len(filter_lists)} custom filter lists via toAdd")
+                    logger.info(
+                        f"Configured uBlock Origin with {len(custom_lists)} custom filter lists "
+                        f"via adminSettings ({len(all_lists)} total including defaults)"
+                    )
 
         return config
 
