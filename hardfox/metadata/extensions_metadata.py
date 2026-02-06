@@ -1,7 +1,7 @@
 """
 Extension metadata for Firefox privacy extensions.
 
-Defines the 6 core privacy-focused extensions available for one-click installation.
+Defines the 9 core privacy-focused extensions available for one-click installation.
 
 Note: HTTPS Everywhere has been deprecated (2022) as Firefox now includes built-in
 HTTPS-Only Mode. Users should enable dom.security.https_only_mode in Firefox settings.
@@ -65,5 +65,29 @@ EXTENSIONS_METADATA = {
         "icon": "🎨",
         "breakage_risk": 3,
         "size_mb": 1.2
+    },
+    "addon@darkreader.org": {
+        "name": "Dark Reader",
+        "description": "Dark mode for every website — protects eyes during night browsing",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi",
+        "icon": "🌙",
+        "breakage_risk": 2,
+        "size_mb": 0.6
+    },
+    "{21f1ba12-47e1-4a9b-ad4e-3a0260bbeb26}": {
+        "name": "RYS — Remove YouTube Suggestions",
+        "description": "Removes YouTube recommendations, Shorts, comments, and more",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/remove-youtube-s-suggestions/latest.xpi",
+        "icon": "📺",
+        "breakage_risk": 1,
+        "size_mb": 0.3
+    },
+    "{446900e4-71c2-419f-a6a7-df9c091e268b}": {
+        "name": "Bitwarden Password Manager",
+        "description": "Open-source password manager for secure credential storage",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi",
+        "icon": "🔑",
+        "breakage_risk": 0,
+        "size_mb": 15.6
     }
 }
