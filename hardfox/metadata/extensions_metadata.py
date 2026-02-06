@@ -15,11 +15,15 @@ EXTENSIONS_METADATA = {
         "icon": "🛡️",
         "breakage_risk": 2,
         "size_mb": 3.2,
-        # Custom filter lists added on top of uBlock Origin's defaults
-        # Loaded via Firefox Enterprise Policies (3rdparty.Extensions, adminSettings format)
-        # adminSettings.selectedFilterLists replaces the full list, so we include uBO defaults + custom URLs
+        # Hagezi filter lists replacing third-party defaults (EasyList, EasyPrivacy, etc.)
+        # Mini variants use top-traffic domains (Umbrella/Cloudflare/Tranco) for ~281k total rules:
+        #   pro.mini (~71k) ads/tracking | tif.mini (~138k) threats | popupads (~58k) | fake (~14k)
+        # Loaded via Enterprise Policies adminSettings.selectedFilterLists (replaces full list)
         "custom_filter_lists": [
-            "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.mini.txt"
+            "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.mini.txt",
+            "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/tif.mini.txt",
+            "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/popupads.txt",
+            "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/fake.txt",
         ]
     },
     "jid1-MnnxcxisBPnSXQ@jetpack": {

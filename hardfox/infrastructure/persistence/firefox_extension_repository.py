@@ -267,7 +267,10 @@ class FirefoxExtensionRepository(IExtensionRepository):
         logger.info(f"Merged {len(new_extension_settings)} extension settings")
         return existing_policies
 
-    # uBlock Origin default filter lists (must be included with adminSettings)
+    # uBlock Origin built-in filter lists (must be included with adminSettings).
+    # Third-party lists (EasyList, EasyPrivacy, URLhaus, Peter Lowe's) are intentionally
+    # excluded — Hagezi lists in extensions_metadata.py replace them with better coverage
+    # and optimized rule counts (~281k total vs ~907k with full Hagezi lists).
     UBLOCK_DEFAULT_FILTER_LISTS = [
         "user-filters",
         "ublock-filters",
@@ -275,10 +278,6 @@ class FirefoxExtensionRepository(IExtensionRepository):
         "ublock-privacy",
         "ublock-abuse",
         "ublock-unbreak",
-        "easylist",
-        "easyprivacy",
-        "urlhaus-1",
-        "plowe-0",
     ]
 
     def _build_third_party_config(self, extension_settings: dict) -> dict:
