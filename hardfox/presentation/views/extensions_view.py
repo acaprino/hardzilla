@@ -8,7 +8,7 @@ import tkinter.messagebox as messagebox
 import customtkinter as ctk
 from typing import Callable
 
-from hardfox.presentation.view_models import ApplyViewModel
+from hardfox.presentation.view_models import ApplyViewModel, SettingsViewModel
 from hardfox.presentation.theme import Theme
 from hardfox.metadata.extensions_metadata import EXTENSIONS_METADATA
 from hardfox.domain.entities.extension import Extension
@@ -28,11 +28,13 @@ class ExtensionsView(ctk.CTkFrame):
         parent,
         view_model: ApplyViewModel,
         on_install_extensions: Callable,
-        on_uninstall_extensions: Callable
+        on_uninstall_extensions: Callable,
+        settings_view_model: SettingsViewModel = None
     ):
         logger.debug("ExtensionsView.__init__: starting initialization")
         super().__init__(parent)
         self.view_model = view_model
+        self.settings_vm = settings_view_model
         self.on_install_extensions = on_install_extensions
         self.on_uninstall_extensions = on_uninstall_extensions
         self.extension_rows = []
@@ -137,11 +139,20 @@ class ExtensionsView(ctk.CTkFrame):
             )
             # Check if ViewModel already has selections; default to checked
             is_checked = ext_id in existing_selections if existing_selections else True
+
+            # Warn if CanvasBlocker is redundant due to Resist Fingerprinting
+            warning_text = None
+            if ext_id == "CanvasBlocker@kkapsner.de" and self.settings_vm:
+                rfp = self.settings_vm.get_setting('resist_fingerprinting')
+                if rfp and rfp.value:
+                    warning_text = "\u26a0 Resist Fingerprinting is enabled \u2014 CanvasBlocker is redundant"
+
             row = ExtensionRow(
                 extensions_frame,
                 extension=extension,
                 on_toggle=self._on_extension_toggled,
-                initial_checked=is_checked
+                initial_checked=is_checked,
+                warning_text=warning_text
             )
             row.pack(fill="x", pady=2)
             self.extension_rows.append(row)

@@ -2,9 +2,10 @@
 Extension row widget for extension selection UI.
 """
 import customtkinter as ctk
-from typing import Callable
+from typing import Callable, Optional
 
 from hardfox.domain.entities.extension import Extension
+from hardfox.presentation.theme import Theme
 
 
 class ExtensionRow(ctk.CTkFrame):
@@ -19,7 +20,8 @@ class ExtensionRow(ctk.CTkFrame):
         parent,
         extension: Extension,
         on_toggle: Callable[[str, bool], None],
-        initial_checked: bool = True
+        initial_checked: bool = True,
+        warning_text: Optional[str] = None
     ):
         super().__init__(parent)
 
@@ -58,6 +60,16 @@ class ExtensionRow(ctk.CTkFrame):
             anchor="w"
         )
         self.label.pack(fill="x", pady=5)
+
+        if warning_text:
+            warning_label = ctk.CTkLabel(
+                content_frame,
+                text=warning_text,
+                font=ctk.CTkFont(size=11),
+                text_color=Theme.get_color('warning'),
+                anchor="w"
+            )
+            warning_label.pack(fill="x", pady=(0, 5))
 
         # Trigger initial state callback
         if initial_checked:

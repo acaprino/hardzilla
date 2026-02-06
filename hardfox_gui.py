@@ -272,7 +272,8 @@ class HardfoxGUI(ctk.CTk):
             parent=self.tabview.tab("Extensions"),
             view_model=self.apply_vm,
             on_install_extensions=self._on_install_extensions,
-            on_uninstall_extensions=self._on_uninstall_extensions
+            on_uninstall_extensions=self._on_uninstall_extensions,
+            settings_view_model=self.settings_vm
         )
         self.extensions_view.pack(fill="both", expand=True)
 
