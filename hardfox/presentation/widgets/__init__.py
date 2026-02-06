@@ -5,6 +5,6 @@ Custom UI components for Hardfox
 """
 
 from hardfox.presentation.widgets.setting_row import SettingRow, SettingTooltip
-from hardfox.presentation.widgets.preset_card import PresetCard
+from hardfox.presentation.widgets.preset_card import PresetTile
 
-__all__ = ['SettingRow', 'SettingTooltip', 'PresetCard']
+__all__ = ['SettingRow', 'SettingTooltip', 'PresetTile']

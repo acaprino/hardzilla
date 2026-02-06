@@ -23,7 +23,7 @@ from hardfox.presentation.reconciliation import VNode, Reconciler
 from hardfox.presentation.theme import Theme
 from hardfox.presentation.utils import bind_search_focus, bind_escape_clear
 from hardfox.presentation.view_models.settings_view_model import SettingsViewModel
-from hardfox.presentation.widgets import PresetCard
+from hardfox.presentation.widgets import PresetTile
 
 logger = logging.getLogger(__name__)
 
@@ -130,16 +130,14 @@ class SettingsView(ctk.CTkFrame):
         content = self.preset_content
         content.grid_columnconfigure(0, weight=1)
 
-        # --- Preset cards (horizontal scroll) ---
-        cards_frame = ctk.CTkScrollableFrame(
-            content,
-            orientation="horizontal",
-            height=520,
-            fg_color="transparent"
-        )
-        cards_frame.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="ew")
+        # --- Preset tiles (3-column grid) ---
+        grid_frame = ctk.CTkFrame(content, fg_color="transparent")
+        grid_frame.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="ew")
+        grid_frame.grid_columnconfigure(0, weight=1)
+        grid_frame.grid_columnconfigure(1, weight=1)
+        grid_frame.grid_columnconfigure(2, weight=1)
 
-        # Sort presets
+        # Ordered presets
         presets_sorted = [
             ('anonymous', PRESET_PROFILES.get('anonymous')),
             ('privacy_enthusiast', PRESET_PROFILES.get('privacy_enthusiast')),
@@ -152,15 +150,17 @@ class SettingsView(ctk.CTkFrame):
             ('casual', PRESET_PROFILES.get('casual'))
         ]
 
+        idx = 0
         for preset_key, preset_data in presets_sorted:
             if preset_data:
-                card = PresetCard(
-                    cards_frame,
+                tile = PresetTile(
+                    grid_frame,
                     preset_data,
                     on_select=lambda key=preset_key: self._on_preset_card_selected(key)
                 )
-                card.pack(side="left", padx=10, pady=10)
-                self.preset_cards[preset_key] = card
+                tile.grid(row=idx // 3, column=idx % 3, padx=5, pady=5, sticky="ew")
+                self.preset_cards[preset_key] = tile
+                idx += 1
 
         # --- Import JSON row ---
         import_frame = ctk.CTkFrame(content, fg_color="transparent")
