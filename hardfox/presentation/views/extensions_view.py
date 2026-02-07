@@ -228,8 +228,16 @@ class ExtensionsView(ctk.CTkFrame):
         if not self.on_install_extensions:
             return
         if not self.view_model.firefox_path:
+            self.extension_status_label.configure(
+                text="\u2717 No Firefox profile selected",
+                text_color=Theme.get_color('error')
+            )
             return
         if not self.view_model.selected_extensions:
+            self.extension_status_label.configure(
+                text="\u2717 No extensions selected",
+                text_color=Theme.get_color('error')
+            )
             return
         self.on_install_extensions()
 
@@ -238,8 +246,16 @@ class ExtensionsView(ctk.CTkFrame):
         if not self.on_uninstall_extensions:
             return
         if not self.view_model.firefox_path:
+            self.extension_status_label.configure(
+                text="\u2717 No Firefox profile selected",
+                text_color=Theme.get_color('error')
+            )
             return
         if not self.view_model.selected_extensions:
+            self.extension_status_label.configure(
+                text="\u2717 No extensions selected",
+                text_color=Theme.get_color('error')
+            )
             return
 
         count = len(self.view_model.selected_extensions)

@@ -49,16 +49,17 @@ class ApplyController:
             return
 
         if not self.view_model.selected_extensions:
-            self._update_extension_ui_state(error="No extensions selected")
+            self._update_extension_ui_state(success=False, error="No extensions selected")
             return
 
         if not self.view_model.firefox_path:
-            self._update_extension_ui_state(error="No Firefox path selected")
+            self._update_extension_ui_state(success=False, error="No Firefox path selected")
             return
 
         if is_firefox_running():
             logger.warning("Cannot install extensions: Firefox is running")
             self._update_extension_ui_state(
+                success=False,
                 error="Firefox is currently running.\n\n"
                       "Please close Firefox completely before installing extensions.\n"
                       "Extension policies are loaded when Firefox starts."
@@ -136,16 +137,17 @@ class ApplyController:
             return
 
         if not self.view_model.selected_extensions:
-            self._update_uninstall_ui_state(error="No extensions selected")
+            self._update_uninstall_ui_state(success=False, error="No extensions selected")
             return
 
         if not self.view_model.firefox_path:
-            self._update_uninstall_ui_state(error="No Firefox path selected")
+            self._update_uninstall_ui_state(success=False, error="No Firefox path selected")
             return
 
         if is_firefox_running():
             logger.warning("Cannot uninstall extensions: Firefox is running")
             self._update_uninstall_ui_state(
+                success=False,
                 error="Firefox is currently running.\n\n"
                       "Please close Firefox completely before uninstalling extensions.\n"
                       "Extension policies are loaded when Firefox starts."

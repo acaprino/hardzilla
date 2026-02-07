@@ -7,6 +7,22 @@ Note: HTTPS Everywhere has been deprecated (2022) as Firefox now includes built-
 HTTPS-Only Mode. Users should enable dom.security.https_only_mode in Firefox settings.
 """
 
+# uBlock Origin's 10 built-in default filter lists (from uBO assets.json).
+# Required because adminSettings.selectedFilterLists REPLACES the entire list —
+# omitting these would disable EasyList, EasyPrivacy, etc.
+UBO_DEFAULT_FILTER_LISTS = [
+    "user-filters",
+    "ublock-filters",
+    "ublock-badware",
+    "ublock-privacy",
+    "ublock-quick-fixes",
+    "ublock-unbreak",
+    "easylist",
+    "easyprivacy",
+    "urlhaus-1",
+    "plowe-0",
+]
+
 EXTENSIONS_METADATA = {
     "uBlock0@raymondhill.net": {
         "name": "uBlock Origin",
@@ -15,10 +31,9 @@ EXTENSIONS_METADATA = {
         "icon": "🛡️",
         "breakage_risk": 2,
         "size_mb": 3.2,
-        # Hagezi filter lists replacing third-party defaults (EasyList, EasyPrivacy, etc.)
+        # Hagezi filter lists added ON TOP of uBO defaults via adminSettings.selectedFilterLists.
         # Mini variants use top-traffic domains (Umbrella/Cloudflare/Tranco) for ~281k total rules:
         #   pro.mini (~71k) ads/tracking | tif.mini (~138k) threats | popupads (~58k) | fake (~14k)
-        # Loaded via Enterprise Policies adminSettings.selectedFilterLists (replaces full list)
         "custom_filter_lists": [
             "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.mini.txt",
             "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/tif.mini.txt",

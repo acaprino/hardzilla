@@ -10,7 +10,7 @@ from datetime import datetime
 
 from hardfox.domain.repositories.i_extension_repository import IExtensionRepository
 from hardfox.domain.enums.extension_status import InstallationStatus
-from hardfox.metadata.extensions_metadata import EXTENSIONS_METADATA
+from hardfox.metadata.extensions_metadata import EXTENSIONS_METADATA, UBO_DEFAULT_FILTER_LISTS
 from hardfox.infrastructure.persistence.firefox_detection import get_firefox_installation_dir
 
 logger = logging.getLogger(__name__)
@@ -267,19 +267,6 @@ class FirefoxExtensionRepository(IExtensionRepository):
         logger.info(f"Merged {len(new_extension_settings)} extension settings")
         return existing_policies
 
-    # uBlock Origin built-in filter lists (must be included with adminSettings).
-    # Third-party lists (EasyList, EasyPrivacy, URLhaus, Peter Lowe's) are intentionally
-    # excluded — Hagezi lists in extensions_metadata.py replace them with better coverage
-    # and optimized rule counts (~281k total vs ~907k with full Hagezi lists).
-    UBLOCK_DEFAULT_FILTER_LISTS = [
-        "user-filters",
-        "ublock-filters",
-        "ublock-badware",
-        "ublock-privacy",
-        "ublock-abuse",
-        "ublock-unbreak",
-    ]
-
     def _build_third_party_config(self, extension_settings: dict) -> dict:
         """
         Build 3rdparty extension configuration for extensions that support it.
@@ -287,9 +274,13 @@ class FirefoxExtensionRepository(IExtensionRepository):
         Currently supports:
         - uBlock Origin: custom filter lists via adminSettings.selectedFilterLists
 
-        Uses adminSettings which is the only method confirmed working on Firefox/Windows.
-        Note: toAdd.filterLists (issue #2545) and toOverwrite (issue #3685) do NOT work
-        on Firefox/Windows.
+        Uses adminSettings because Firefox bug #1762253 returns managed storage
+        properties from policies.json as strings instead of objects. uBlock Origin
+        only JSON.parse()s the adminSettings property — toAdd and toOverwrite are
+        silently ignored on Firefox.
+
+        selectedFilterLists replaces the entire list, so UBO_DEFAULT_FILTER_LISTS
+        must be included alongside any custom lists.
 
         Args:
             extension_settings: Dictionary of extension IDs being installed
@@ -305,19 +296,20 @@ class FirefoxExtensionRepository(IExtensionRepository):
 
             ext_data = EXTENSIONS_METADATA[ext_id]
 
-            # uBlock Origin custom filter lists (adminSettings format)
+            # uBlock Origin filter lists via adminSettings (Firefox-compatible)
             if ext_id == "uBlock0@raymondhill.net" and "custom_filter_lists" in ext_data:
                 custom_lists = ext_data["custom_filter_lists"]
                 if custom_lists:
-                    all_lists = self.UBLOCK_DEFAULT_FILTER_LISTS + list(custom_lists)
+                    all_lists = list(UBO_DEFAULT_FILTER_LISTS) + list(custom_lists)
                     config[ext_id] = {
                         "adminSettings": {
                             "selectedFilterLists": all_lists
                         }
                     }
                     logger.info(
-                        f"Configured uBlock Origin with {len(custom_lists)} custom filter lists "
-                        f"via adminSettings ({len(all_lists)} total including defaults)"
+                        f"Configured uBlock Origin with {len(all_lists)} filter lists "
+                        f"({len(UBO_DEFAULT_FILTER_LISTS)} defaults + {len(custom_lists)} custom) "
+                        f"via adminSettings.selectedFilterLists"
                     )
 
         return config
@@ -328,9 +320,10 @@ class FirefoxExtensionRepository(IExtensionRepository):
         extension_ids: List[str]
     ) -> Dict[str, InstallationStatus]:
         """
-        Uninstall extensions from Firefox by removing them from policies.json.
+        Uninstall extensions from Firefox by blocking them in policies.json.
 
-        Removes extension entries from ExtensionSettings and 3rdparty.Extensions.
+        Sets installation_mode to "blocked" so Firefox actively removes the
+        extensions on next startup. Also removes any 3rdparty config.
 
         Args:
             profile_path: Path to Firefox profile directory
@@ -350,11 +343,8 @@ class FirefoxExtensionRepository(IExtensionRepository):
                 return {ext_id: InstallationStatus.FAILED for ext_id in extension_ids}
 
             dist_dir = firefox_dir / "distribution"
+            self._create_distribution_dir(dist_dir)
             policies_file = dist_dir / "policies.json"
-
-            if not policies_file.exists():
-                logger.warning("No policies.json found, nothing to uninstall")
-                return {ext_id: InstallationStatus.FAILED for ext_id in extension_ids}
 
             if not self._check_write_permission(dist_dir):
                 raise PermissionError(
@@ -363,9 +353,17 @@ class FirefoxExtensionRepository(IExtensionRepository):
                 )
 
             existing_policies = self._read_existing_policies(policies_file)
-            self._backup_policies(policies_file)
 
-            ext_settings = existing_policies.get("policies", {}).get("ExtensionSettings", {})
+            if policies_file.exists():
+                self._backup_policies(policies_file)
+
+            # Ensure ExtensionSettings exists
+            if "policies" not in existing_policies:
+                existing_policies["policies"] = {}
+            if "ExtensionSettings" not in existing_policies["policies"]:
+                existing_policies["policies"]["ExtensionSettings"] = {}
+
+            ext_settings = existing_policies["policies"]["ExtensionSettings"]
             third_party_exts = (
                 existing_policies.get("policies", {})
                 .get("3rdparty", {})
@@ -374,23 +372,18 @@ class FirefoxExtensionRepository(IExtensionRepository):
 
             results = {}
             for ext_id in extension_ids:
-                removed = False
-                if ext_id in ext_settings:
-                    del ext_settings[ext_id]
-                    removed = True
+                # Set to "blocked" so Firefox actively removes the extension
+                ext_settings[ext_id] = {
+                    "installation_mode": "blocked"
+                }
+                # Remove any 3rdparty config for this extension
                 if ext_id in third_party_exts:
                     del third_party_exts[ext_id]
-                    removed = True
 
                 results[ext_id] = InstallationStatus.UNINSTALLED
-                if removed:
-                    logger.info(f"Removed extension from policies: {ext_id}")
-                else:
-                    logger.info(f"Extension not in policies (already absent): {ext_id}")
+                logger.info(f"Blocked extension in policies: {ext_id}")
 
-            # Clean up empty structures
-            if not ext_settings:
-                existing_policies["policies"].pop("ExtensionSettings", None)
+            # Clean up empty 3rdparty structures
             if not third_party_exts:
                 if "3rdparty" in existing_policies.get("policies", {}):
                     existing_policies["policies"]["3rdparty"].pop("Extensions", None)
@@ -400,7 +393,7 @@ class FirefoxExtensionRepository(IExtensionRepository):
             with open(policies_file, 'w', encoding='utf-8') as f:
                 json.dump(existing_policies, f, indent=2)
 
-            logger.info(f"Successfully updated policies.json, removed {sum(1 for s in results.values() if s == InstallationStatus.UNINSTALLED)} extensions")
+            logger.info(f"Successfully updated policies.json, blocked {len(results)} extensions")
             return results
 
         except Exception as e:
