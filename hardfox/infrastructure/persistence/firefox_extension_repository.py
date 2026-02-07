@@ -235,14 +235,18 @@ class FirefoxExtensionRepository(IExtensionRepository):
         new_extension_settings: dict
     ) -> dict:
         """
-        Merge new extension settings with existing policies.
+        Reconcile extension settings with existing policies.
+
+        Installs selected extensions and blocks any previously-installed
+        known extensions that were deselected. Unknown extensions (not in
+        EXTENSIONS_METADATA) are left untouched.
 
         Args:
             existing_policies: Existing policies dictionary
-            new_extension_settings: New extension settings to add
+            new_extension_settings: Extension settings for selected extensions
 
         Returns:
-            Merged policies dictionary
+            Updated policies dictionary
         """
         # Ensure structure exists
         if "policies" not in existing_policies:
@@ -251,8 +255,23 @@ class FirefoxExtensionRepository(IExtensionRepository):
         if "ExtensionSettings" not in existing_policies["policies"]:
             existing_policies["policies"]["ExtensionSettings"] = {}
 
-        # Merge extension settings (new settings override existing)
-        existing_policies["policies"]["ExtensionSettings"].update(new_extension_settings)
+        ext_settings = existing_policies["policies"]["ExtensionSettings"]
+
+        # Block known extensions that were deselected and clean up their 3rdparty config
+        third_party_exts = (
+            existing_policies.get("policies", {})
+            .get("3rdparty", {})
+            .get("Extensions", {})
+        )
+        for ext_id in EXTENSIONS_METADATA:
+            if ext_id not in new_extension_settings and ext_id in ext_settings:
+                ext_settings[ext_id] = {"installation_mode": "blocked"}
+                if ext_id in third_party_exts:
+                    del third_party_exts[ext_id]
+                logger.info(f"Blocked deselected extension: {ext_id}")
+
+        # Install selected extensions (overrides any previous blocked state)
+        ext_settings.update(new_extension_settings)
 
         # Add 3rdparty extension configurations (e.g., uBlock Origin filter lists)
         third_party_config = self._build_third_party_config(new_extension_settings)

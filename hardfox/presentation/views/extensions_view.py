@@ -354,13 +354,14 @@ class ExtensionsView(ctk.CTkFrame):
         )
 
     def _on_installed_extensions_changed(self, installed: List[str]):
-        """Sync checkboxes to match extensions installed in the current profile.
+        """Sync checkboxes to match the current selected_extensions.
 
-        Only updates the UI checkboxes. The controller is responsible for
-        setting selected_extensions on the ViewModel to avoid mutation
-        inside an observer callback.
+        The controller sets selected_extensions BEFORE installed_extensions,
+        so by the time this observer fires, selected_extensions already
+        reflects the desired state (installed list when extensions exist,
+        or all extensions when none are installed yet).
         """
-        self._sync_checkboxes_to(installed)
+        self._sync_checkboxes_to(self.view_model.selected_extensions)
 
     def _sync_checkboxes_to(self, ext_ids: List[str]):
         """Check/uncheck extension rows to match the given ID list.

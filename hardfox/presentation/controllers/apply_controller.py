@@ -123,6 +123,8 @@ class ApplyController:
                 self.view_model.extension_install_results = results
             if success is not None:
                 self.view_model.extension_install_success = success
+                if success:
+                    self._refresh_installed_after_operation()
             if error is not None:
                 self.view_model.extension_error_message = error
             else:
@@ -214,6 +216,8 @@ class ApplyController:
                 self.view_model.extension_uninstall_results = results
             if success is not None:
                 self.view_model.extension_uninstall_success = success
+                if success:
+                    self._refresh_installed_after_operation()
             if error is not None:
                 self.view_model.extension_uninstall_error_message = error
             else:
@@ -224,18 +228,47 @@ class ApplyController:
         else:
             update()
 
+    def _refresh_installed_after_operation(self) -> None:
+        """Refresh installed_extensions after install/uninstall without
+        resetting the user's current checkbox selections."""
+        if not self.view_model.firefox_path:
+            return
+        try:
+            installed = self.uninstall_extensions.get_installed(
+                profile_path=Path(self.view_model.firefox_path)
+            )
+            # Only update installed baseline — don't touch selected_extensions
+            # so the user's checkbox state is preserved.
+            self.view_model.installed_extensions = installed
+            logger.info(f"Post-operation refresh: {len(installed)} extensions installed")
+        except Exception as e:
+            logger.error(f"Failed to refresh installed extensions: {e}")
+
     def handle_refresh_installed_extensions(self) -> None:
-        """Refresh the list of installed extensions from policies.json."""
+        """Refresh the list of installed extensions from policies.json.
+
+        Sets selected_extensions BEFORE installed_extensions so that
+        the view observer can sync checkboxes to the correct selection.
+        When no extensions are installed, defaults to all extensions
+        selected so the user can install everything with one click.
+        """
         if not self.view_model.firefox_path:
             self.view_model.installed_extensions = []
             return
 
         try:
+            from hardfox.metadata.extensions_metadata import EXTENSIONS_METADATA
+
             installed = self.uninstall_extensions.get_installed(
                 profile_path=Path(self.view_model.firefox_path)
             )
+            # Set selected BEFORE installed so the observer can read it
+            if installed:
+                self.view_model.selected_extensions = list(installed)
+            else:
+                # No extensions installed yet — default to all selected
+                self.view_model.selected_extensions = list(EXTENSIONS_METADATA.keys())
             self.view_model.installed_extensions = installed
-            self.view_model.selected_extensions = list(installed)
             logger.info(f"Refreshed installed extensions: {len(installed)} found")
         except Exception as e:
             logger.error(f"Failed to refresh installed extensions: {e}")
