@@ -75,9 +75,15 @@ class LoadPresetUseCase:
                 if pref_key in all_settings_by_pref:
                     base_setting = all_settings_by_pref[pref_key]
 
-                    # For dropdowns, we need to map value to label
+                    # Map preset values to the format each setting type expects
                     mapped_value = value
-                    if base_setting.setting_type == SettingType.DROPDOWN:
+
+                    # For toggles with non-boolean values, ensure preset value is actual Firefox value
+                    if base_setting.setting_type == SettingType.TOGGLE and base_setting.toggle_values:
+                        if isinstance(value, bool):
+                            mapped_value = base_setting.toggle_values[0] if value else base_setting.toggle_values[1]
+
+                    elif base_setting.setting_type == SettingType.DROPDOWN:
                         # Get values and labels from metadata
                         values_list = meta_data.get('values', [])
                         labels_list = meta_data.get('labels', [])

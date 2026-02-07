@@ -31,6 +31,12 @@ class SettingToPrefMapper:
         """
         pref_value = setting.value
 
+        # For toggles with non-boolean values, convert bool back to actual value
+        # This catches edge cases like imported profiles with true/false
+        if setting.setting_type == SettingType.TOGGLE and setting.toggle_values and isinstance(pref_value, bool):
+            pref_value = setting.toggle_values[0] if pref_value else setting.toggle_values[1]
+            logger.debug(f"Converted toggle bool {setting.value} to Firefox value {pref_value} for {setting.key}")
+
         # For dropdowns with firefox_values mapping, convert label to Firefox value
         if setting.setting_type == SettingType.DROPDOWN and setting.firefox_values:
             firefox_value = setting.label_to_firefox_value(setting.value)

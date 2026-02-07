@@ -4,10 +4,13 @@ Setting Row Widget with Visual Polish
 Displays settings with badges, color coding, and tooltips
 """
 
+import logging
 import customtkinter as ctk
 from typing import Callable, Optional
 from hardfox.domain.entities import Setting
 from hardfox.domain.enums import SettingLevel, SettingType
+
+logger = logging.getLogger(__name__)
 
 
 class SettingRow(ctk.CTkFrame):
@@ -220,12 +223,19 @@ class SettingRow(ctk.CTkFrame):
             command=self._on_toggle_changed
         )
 
-        # Set initial value
-        if isinstance(self.setting.value, bool):
-            if self.setting.value:
-                switch.select()
-            else:
-                switch.deselect()
+        # Set initial value - handle non-boolean toggle values (e.g., [3, 1])
+        value = self.setting.value
+        if self.setting.toggle_values:
+            is_on = value == self.setting.toggle_values[0]
+            if value not in self.setting.toggle_values:
+                logger.warning(f"Toggle '{self.setting.key}' has value {value!r} not in toggle_values {self.setting.toggle_values}")
+        else:
+            is_on = bool(value)
+
+        if is_on:
+            switch.select()
+        else:
+            switch.deselect()
 
         return switch
 
@@ -340,7 +350,12 @@ class SettingRow(ctk.CTkFrame):
             # Get switch widget
             switch = [w for w in self.winfo_children() if isinstance(w, ctk.CTkSwitch)]
             if switch:
-                new_value = switch[0].get() == 1
+                is_on = switch[0].get() == 1
+                # Map to actual values for non-boolean toggles (e.g., 3/1)
+                if self.setting.toggle_values:
+                    new_value = self.setting.toggle_values[0] if is_on else self.setting.toggle_values[1]
+                else:
+                    new_value = is_on
                 self.on_change(self.setting.key, new_value)
 
     def _on_dropdown_changed(self, value: str):

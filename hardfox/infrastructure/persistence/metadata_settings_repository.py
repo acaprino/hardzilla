@@ -124,8 +124,15 @@ class MetadataSettingsRepository(ISettingsRepository):
         step = None
         options = None
         firefox_values = None
+        toggle_values = None
 
-        if setting_type == SettingType.SLIDER:
+        if setting_type == SettingType.TOGGLE:
+            # For toggles with non-boolean values (e.g., browser.startup.page: [3, 1])
+            values_list = metadata.get('values', [])
+            if len(values_list) == 2 and not all(isinstance(v, bool) for v in values_list):
+                toggle_values = values_list  # [on_value, off_value]
+
+        elif setting_type == SettingType.SLIDER:
             # For sliders, use values list
             values_list = metadata.get('values', [])
             if values_list:
@@ -190,6 +197,7 @@ class MetadataSettingsRepository(ISettingsRepository):
             step=step,
             options=options,
             firefox_values=firefox_values,
+            toggle_values=toggle_values,
             intent_tags=intent_tags,
             breakage_score=breakage_score,
             visibility=visibility

@@ -28,6 +28,7 @@ class Setting:
         step: Step increment for sliders
         options: Available choices for dropdowns (UI labels)
         firefox_values: For dropdowns - actual Firefox pref values (parallel to options)
+        toggle_values: For toggles - [on_value, off_value] when non-boolean (e.g., [3, 1])
         intent_tags: Tags for intent matching (e.g., ["banking", "privacy"])
         breakage_score: 0-10 scale of likelihood to break sites
         visibility: "core" (show by default) or "advanced" (progressive disclosure)
@@ -45,6 +46,7 @@ class Setting:
     step: Optional[int] = None
     options: Optional[List[str]] = None
     firefox_values: Optional[List[Any]] = None  # For dropdowns: actual Firefox pref values (parallel to options/labels)
+    toggle_values: Optional[List[Any]] = None  # For toggles: [on_value, off_value] when non-boolean (e.g., [3, 1])
     intent_tags: List[str] = field(default_factory=list)
     breakage_score: int = 0
     visibility: str = "core"
@@ -131,6 +133,7 @@ class Setting:
             step=self.step,
             options=self.options,
             firefox_values=self.firefox_values,
+            toggle_values=self.toggle_values,
             intent_tags=self.intent_tags.copy(),
             breakage_score=self.breakage_score,
             visibility=self.visibility
