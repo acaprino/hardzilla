@@ -306,9 +306,8 @@ class FirefoxExtensionRepository(IExtensionRepository):
 
         selectedFilterLists replaces the entire list. We include:
         - user-filters (so users can add their own rules)
-        - builtin_filter_lists (uBO native: cosmetic filters, privacy, unbreak)
+        - builtin_filter_lists (uBO defaults + extras like quick-fixes, AdGuard URL tracking)
         - custom_filter_lists (Hagezi: DNS-level domain blocking)
-        Other uBO defaults (EasyList, EasyPrivacy, etc.) remain deselected.
 
         Args:
             extension_settings: Dictionary of extension IDs being installed

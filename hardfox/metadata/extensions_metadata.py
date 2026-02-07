@@ -15,15 +15,22 @@ EXTENSIONS_METADATA = {
         "icon": "🛡️",
         "breakage_risk": 2,
         "size_mb": 3.2,
-        # uBO built-in filters for cosmetic filtering, script blocking, privacy & site fixes.
-        # These are lightweight native uBO lists that complement Hagezi's DNS-level blocking.
+        # uBO default filter lists + AdGuard URL tracking extra.
+        # All 9 lists below are uBO's fresh-install defaults.
+        # adguard-spyware-url is the only extra (strips tracking params via removeparam).
         "builtin_filter_lists": [
+            # --- uBO defaults (verified against assets.json) ---
             "ublock-filters",       # uBO cosmetic + script filters (main list)
             "ublock-badware",       # uBO badware/malware risk blocking
             "ublock-privacy",       # uBO privacy-specific filters
             "ublock-quick-fixes",   # uBO temporary site compatibility fixes
             "ublock-unbreak",       # fixes for sites broken by other filters
-            "adguard-url-tracking-protection",  # strips tracking params from URLs (removeparam)
+            "easylist",             # EasyList — primary ad-blocking list
+            "easyprivacy",          # EasyPrivacy — tracker blocking
+            "urlhaus-1",            # URLHaus malicious URL blocklist
+            "plowe-0",              # Peter Lowe's ad/tracking server list
+            # --- extra (on top of defaults) ---
+            "adguard-spyware-url",  # AdGuard/uBO URL Tracking Protection (removeparam)
         ],
         # Hagezi external filter lists for DNS-level domain blocking.
         # Mini variants use top-traffic domains (Umbrella/Cloudflare/Tranco) for ~281k total rules:
